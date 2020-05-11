@@ -223,4 +223,4 @@ function editor() {
     return root;
 }
 
-document.body.appendChild(editor());
+return editor;
