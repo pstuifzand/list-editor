@@ -2,14 +2,20 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 
-function editor(root) {
+function editor(root, inputData) {
     //const root = document.createElement('div');
     root.classList.add('root')
 
     let drake = null;
     let data = [{id: 1, indented: 0, text: ''}];
+    if (inputData.length) {
+        data = inputData
+    }
     let selected = -1;
     let count = data.length;
+    let events = {
+        change: []
+    }
 
     let editing = false
     let currentEditor = null;
@@ -88,6 +94,9 @@ function editor(root) {
                     selected = stop
                     updateSelected = false
                 }
+                _.each(events['change'], function (handler) {
+                    handler()
+                })
             }
         })
         return drake;
@@ -102,6 +111,11 @@ function editor(root) {
             id: element.data('id'),
             text: text
         })
+
+        _.each(events['change'], function (handler) {
+            handler()
+        })
+
         let $span = $('<span class="content">');
         $span.html(text)
         element.replaceWith($span);
@@ -134,6 +148,10 @@ function editor(root) {
         });
     }
 
+    function on(evt, handler) {
+        events[evt].push(handler)
+    }
+
     $(document).on('keydown', 'input.input', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, data, $(this))
@@ -155,6 +173,9 @@ function editor(root) {
         } else if (event.key === 'Delete') {
             data.splice(selected, 1)
             next = false
+            _.each(events['change'], function (handler) {
+                handler()
+            })
         } else if (event.key === 'Enter') {
             if (event.shiftKey) {
                 count++;
@@ -167,12 +188,18 @@ function editor(root) {
                 data.splice(selected, 0, newListItem(count, selected >= 1 ? data[selected - 1].indented : 0));
                 next = false
             }
+            _.each(events['change'], function (handler) {
+                handler()
+            })
         } else if (event.key === 'Tab') {
             if (event.shiftKey) {
                 data[selected].indented = Math.max(data[selected].indented - 1, 0);
             } else {
                 data[selected].indented = Math.min(data[selected].indented + 1, 32);
             }
+            _.each(events['change'], function (handler) {
+                handler()
+            })
             next = false
         }
         disableDragging(drake)
@@ -221,6 +248,7 @@ function editor(root) {
     startEditing(root, data, 0)
 
     return {
+        on: on,
         save: save
     };
 }
