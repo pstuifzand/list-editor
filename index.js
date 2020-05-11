@@ -2,14 +2,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import dragula from 'dragula';
 
-function component() {
-    const element = document.createElement('div');
-    element.innerHTML = _.join(['Hello', 'webpack'], ' ');
-    return element;
-}
-
-function editor() {
-    const root = document.createElement('div');
+function editor(root) {
+    //const root = document.createElement('div');
     root.classList.add('root')
 
     let drake = null;
@@ -32,7 +26,7 @@ function editor() {
         let line = $('<div class="line">')
         line.prepend($('<span class="content"></span>')
             .html(value.text))
-        line.prepend($('<span class="marker"/span>'))
+        line.prepend($('<span class="marker"></span>'))
         el.prepend(line)
         return el;
     }
@@ -134,6 +128,12 @@ function editor() {
         currentEditor = $textarea
     }
 
+    function save() {
+        return new Promise(function (resolve, reject) {
+            resolve(data);
+        });
+    }
+
     $(document).on('keydown', 'input.input', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, data, $(this))
@@ -220,7 +220,9 @@ function editor() {
     selected = 0
     startEditing(root, data, 0)
 
-    return root;
+    return {
+        save: save
+    };
 }
 
-return editor;
+export default editor
