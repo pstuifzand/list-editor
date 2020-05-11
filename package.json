@@ -1,7 +1,7 @@
 {
   "name": "list-editor",
   "version": "0.1.0",
-  "description": "",
+  "description": "Simple editor of lists",
   "author": "Peter Stuifzand <peter@p83.nl>",
   "main": "index.js",
   "scripts": {
@@ -13,5 +13,14 @@
     "dragula": "^3.7.2",
     "jquery": "^3.5.1",
     "lodash": "^4.17.15"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/pstuifzand/list-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pstuifzand/list-editor/issues"
+  },
+  "homepage": "https://github.com/pstuifzand/list-editor#readme"
 }
