@@ -1,20 +1,14 @@
 {
-  "name": "listeditor2",
-  "version": "1.0.0",
+  "name": "list-editor",
+  "version": "0.1.0",
   "description": "",
-  "private": true,
+  "author": "Peter Stuifzand <peter@p83.nl>",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0"
-  },
   "dependencies": {
     "dragula": "^3.7.2",
     "jquery": "^3.5.1",
