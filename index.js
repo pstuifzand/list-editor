@@ -3,7 +3,6 @@ import $ from 'jquery';
 import dragula from 'dragula';
 
 function editor(root, inputData) {
-    //const root = document.createElement('div');
     root.classList.add('root')
 
     let drake = null;
