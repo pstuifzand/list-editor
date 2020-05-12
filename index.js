@@ -182,9 +182,15 @@ function editor(root, inputData) {
         let prevSelected = selected
         if (event.key === 'ArrowUp') {
             selected--;
+            if (selected < 0) {
+                selected = data.length - 1;
+            }
             next = false
         } else if (event.key === 'ArrowDown') {
             selected++;
+            if (selected >= data.length) {
+                selected = 0;
+            }
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {
             data.splice(selected, 1)
