@@ -181,13 +181,12 @@ function editor(root, inputData) {
         } else if (event.key === 'ArrowDown') {
             selected++;
             next = false
-        /*} else if (event.key === 'Delete') {
+        } else if (event.shiftKey && event.key === 'Delete') {
             data.splice(selected, 1)
             next = false
             _.each(events['change'], function (handler) {
                 handler()
             })
-            */
         } else if (event.key === 'Enter') {
             if (event.shiftKey) {
                 count++;
