@@ -202,7 +202,6 @@ function editor(root, inputData) {
             stopEditing(root, data, currentEditor);
             if (event.shiftKey) {
                 count++;
-                selected = Math.max(selected - 1, 0)
                 data.splice(selected, 0, newListItem(count, 0));
                 next = false
             } else {
