@@ -199,6 +199,7 @@ function editor(root, inputData) {
                 handler()
             })
         } else if (event.key === 'Enter') {
+            stopEditing(root, data, currentEditor);
             if (event.shiftKey) {
                 count++;
                 selected = Math.max(selected - 1, 0)
@@ -236,7 +237,6 @@ function editor(root, inputData) {
             }
         }
         if (event.key === 'Enter') {
-            stopEditing(root, data, currentEditor);
             startEditing(root, data, selected);
             return false
         } else if (event.key === 'Escape') {
