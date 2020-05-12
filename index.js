@@ -239,7 +239,7 @@ function editor(root, inputData) {
 
     $(document).on('click', 'div.list-item', function () {
         let currentIndex = $(root).children('div.list-item').index(this)
-        if (currentIndex === selected && currentEditor.closest('.list-item')[0] === this) {
+        if (currentIndex === selected && currentEditor !== null && currentEditor.closest('.list-item')[0] === this) {
             return true
         }
         selected = currentIndex
