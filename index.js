@@ -158,8 +158,20 @@ function editor(root, inputData) {
             return false
         }
 
+        if (event.key === '[') {
+            let input = this
+            let val = input.value
+            let prefix = val.substring(0, input.selectionStart)
+            let selection = val.substring(input.selectionStart,input.selectionEnd)
+            let suffix = val.substring(input.selectionEnd)
+            input.value = prefix + '[[' + selection + ']]' + suffix
+            input.selectionStart = prefix.length + 2
+            input.selectionEnd   = input.selectionStart + selection.length
+            return false;
+        }
+
         return true
-    })
+    });
 
     $(document).on('keydown', function (event) {
         let next = true
