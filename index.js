@@ -102,7 +102,12 @@ function editor(root, inputData) {
     }
 
     function stopEditing(rootElement, data, element) {
-        if (!editing) return;
+        if (!editing) return
+        if (element === null) {
+            editing = false
+            currentEditor = null
+            return
+        }
 
         let text = element.val()
         $(element).closest('.list-item').removeClass('editor');
