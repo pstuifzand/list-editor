@@ -201,16 +201,14 @@ function editor(root, inputData) {
             })
         } else if (event.key === 'Enter') {
             stopEditing(root, data, currentEditor);
-            if (event.shiftKey) {
-                count++;
-                data.splice(selected, 0, newListItem(count, 0));
-                next = false
-            } else {
-                count++;
+            let indent = data[selected].indented;
+            count++;
+            if (!event.shiftKey) {
                 selected++;
-                data.splice(selected, 0, newListItem(count, selected >= 1 ? data[selected - 1].indented : 0));
-                next = false
             }
+            data.splice(selected, 0, newListItem(count, indent));
+            next = false
+
             _.each(events['change'], function (handler) {
                 handler()
             })
@@ -218,7 +216,7 @@ function editor(root, inputData) {
             if (event.shiftKey) {
                 data[selected].indented = Math.max(data[selected].indented - 1, 0);
             } else {
-                data[selected].indented = Math.min(data[selected].indented + 1, 32);
+                data[selected].indented++;
             }
             _.each(events['change'], function (handler) {
                 handler()
