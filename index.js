@@ -193,6 +193,7 @@ function editor(root, inputData) {
             }
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {
+            stopEditing(root, data, currentEditor);
             data.splice(selected, 1)
             next = false
             _.each(events['change'], function (handler) {
