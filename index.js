@@ -216,7 +216,7 @@ function editor(root, inputData) {
             if (event.shiftKey) {
                 data[selected].indented = Math.max(data[selected].indented - 1, 0);
             } else {
-                data[selected].indented++;
+                data[selected].indented = Math.min(data[selected-1].indented + 1, data[selected].indented + 1)
             }
             _.each(events['change'], function (handler) {
                 handler()
