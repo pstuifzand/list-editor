@@ -132,7 +132,7 @@ function editor(root, inputData) {
         editing = true
 
         let elements = $(rootElement).children('div.list-item');
-        let $textarea = $('<input type="text" class="input">');
+        let $textarea = $('<input type="text" class="input-line">');
         $textarea.val(data[selected].text);
         let $selectedElement = elements.slice(selected, selected + 1)
         $selectedElement.find('.content').replaceWith($textarea)
@@ -156,7 +156,7 @@ function editor(root, inputData) {
         events[evt].push(handler)
     }
 
-    $(document).on('keydown', 'input.input', function (event) {
+    $(document).on('keydown', 'input.input-line', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, data, $(this))
             return false
