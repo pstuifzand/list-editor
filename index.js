@@ -213,7 +213,9 @@ function editor(root, inputData) {
                 handler()
             })
         } else if (event.key === 'Tab') {
-            if (event.shiftKey) {
+            if (selected == 0) {
+                data[selected].indented = 0;
+            } else if (event.shiftKey) {
                 data[selected].indented = Math.max(data[selected].indented - 1, 0);
             } else {
                 data[selected].indented = Math.min(data[selected-1].indented + 1, data[selected].indented + 1)
