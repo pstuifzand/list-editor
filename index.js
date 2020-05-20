@@ -268,6 +268,7 @@ function editor(root, inputData) {
                 handler()
             })
         } else if (event.key === 'Tab') {
+            let prevIndent = data[cursor2.get()].indented
             if (cursor2.atFirst()) {
                 data[cursor2.get()].indented = 0;
             } else if (event.shiftKey) {
@@ -275,9 +276,12 @@ function editor(root, inputData) {
             } else {
                 data[cursor2.get()].indented = Math.min(data[cursor2.get()-1].indented + 1, data[cursor2.get()].indented + 1)
             }
-            _.each(events['change'], function (handler) {
-                handler()
-            })
+            let newIndent = data[cursor2.get()].indented
+            if (prevIndent !== newIndent) {
+                _.each(events['change'], function (handler) {
+                    handler()
+                })
+            }
             next = false
         }
         disableDragging(drake)
