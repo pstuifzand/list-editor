@@ -174,6 +174,31 @@ function editor(root, inputData) {
         events[evt].push(handler)
     }
 
+    $(document).on('paste', 'input.input-line', function (event) {
+        let parentItem = $(this).parents('.list-item')
+        let index = $(root).children('div.list-item').index(parentItem)
+        let pastedData = event.originalEvent.clipboardData.getData('text')
+        let lines = pastedData.split(/\n/)
+
+        let baseIndent = data[index].indented
+
+        let newItems = _.filter(_.map(lines, function (line) {
+            if (line.length == 0) return;
+            let matches = line.match(/(\s{4})/g)
+            let relIndent = matches ? matches.length : 0;
+
+            count++
+            let newItem = newListItem(count, baseIndent+relIndent)
+            newItem.text = line.replace(/^\s+/, '')
+            return newItem
+        }))
+        data.splice(index+1, 0, ...newItems)
+        disableDragging(drake)
+        render(root, data);
+        drake = enableDragging(root)
+        return false
+    });
+
     $(document).on('keydown', 'input.input-line', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, data, $(this))
