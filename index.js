@@ -3,10 +3,97 @@ import $ from 'jquery';
 import dragula from 'dragula';
 import createCursor from './cursor';
 
+// consecutive for now
+function createSelection() {
+    let first = -1;
+    let last = -1;
+
+    return {
+        reset() {
+            first = -1
+            last  = -1
+        },
+
+        setFirst(f) {
+            if (f > last) {
+                last = first
+            }
+            first = f
+        },
+
+        setLast(l) {
+            if (l < first) {
+                first = last
+            }
+            last = l
+        },
+
+        remove(data) {
+            data.splice(first, last-first)
+            return data
+        },
+
+        hasSelection() {
+            return first >= 0 && last >= 0
+        },
+
+        isSelected(line) {
+            return first >= 0 && last >= 0 && line >= first && line < last
+        },
+
+        isSelectedFirst(line) {
+            return first >= 0 && last >= 0 && line === first
+        },
+
+        isSelectedLast(line) {
+            return first >= 0 && last >= 0 && line < last && line+1 === last
+        },
+
+        indent(data, dir) {
+            let removed = data.splice(first, last-first)
+            console.log('before:removed', removed)
+            removed = _.reduce(removed, function (list, item) {
+                if (first === 0 && list.length === 0) {
+                    item.indented = 0
+                } else {
+                    let indent = item.indented + dir
+                    let prevIndent = 
+                        list.length === 0 
+                        ? data[first-1].indented
+                        : _.last(list).indented
+
+                    indent = Math.max(0, indent)
+
+                    if (Math.abs(prevIndent - indent) <= 1) {
+                        item.indented = indent
+                    }
+                }
+                list.push(item)
+                return list
+            }, [])
+            console.log('after:removed', removed)
+            data.splice(first, 0, ...removed)
+            console.log('data', data)
+            return data
+        },
+
+        include(index) {
+            first = Math.min(first, index)
+            last = Math.max(last, index+1);
+        },
+
+        debug() {
+            return { first, last }
+        }
+    };
+}
+
+
 function editor(root, inputData) {
     root.classList.add('root')
 
     let cursor = createCursor();
+    let selection = createSelection();
 
     let drake = null;
     let data = [{id: 1, indented: 0, text: ''}];
@@ -54,6 +141,9 @@ function editor(root, inputData) {
             let value = enterData[index];
             $(li).data('id', value.id)
                 .toggleClass('selected', cursor.atPosition(index))
+                .toggleClass('selection-first', selection.isSelectedFirst(index))
+                .toggleClass('selection-last', selection.isSelectedLast(index))
+                .toggleClass('selection', selection.isSelected(index))
                 .css('margin-left', (value.indented * 32) + 'px')
                 .find('.content')
                 .html(value.text)
@@ -62,6 +152,9 @@ function editor(root, inputData) {
         _.each(exitData, function (value, index) {
             let $li = newItem(value)
                 .css('margin-left', (value.indented * 32) + 'px')
+                .toggleClass('selection-first', selection.isSelectedFirst(index))
+                .toggleClass('selection-last', selection.isSelectedLast(index))
+                .toggleClass('selection', selection.isSelected(index))
                 .toggleClass('selected', cursor.atPosition(index + $enter.length));
             $(rootElement).append($li)
         })
@@ -91,6 +184,9 @@ function editor(root, inputData) {
                     return;
                 }
                 data.splice(stop, 0, ...removed)
+                if (stop === 0 && removed.length > 0) {
+                    removed[0].indented = 0
+                }
                 if (updateSelected) {
                     cursor.set(stop)
                     updateSelected = false
@@ -157,6 +253,8 @@ function editor(root, inputData) {
     $(document).on('keydown', 'input.input-line', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, data, $(this))
+            selection.setFirst(cursor.get())
+            selection.setLast(cursor.get()+1)
             return false
         }
 
@@ -180,9 +278,23 @@ function editor(root, inputData) {
         let prevSelected = cursor.save();
         if (event.key === 'ArrowUp') {
             cursor.moveUp(data);
+            if (event.shiftKey) {
+                selection.include(cursor.get())
+            } else {
+                selection.setFirst(cursor.get())
+                selection.setLast(cursor.get()+1)
+            }
+            console.log(selection.debug())
             next = false
         } else if (event.key === 'ArrowDown') {
             cursor.moveDown(data);
+            if (event.shiftKey) {
+                selection.include(cursor.get())
+            } else {
+                selection.setFirst(cursor.get())
+                selection.setLast(cursor.get()+1)
+            }
+            console.log(selection.debug())
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {
             stopEditing(root, data, currentEditor);
@@ -205,24 +317,35 @@ function editor(root, inputData) {
                 data = cursor.insertBelow(data, item)
             }
 
+            selection.setFirst(cursor.get())
+            selection.setLast(cursor.get()+1)
+
             _.each(events['change'], function (handler) {
                 handler()
             })
         } else if (event.key === 'Tab') {
-            let prevIndent = data[cursor.get()].indented
-            if (cursor.atFirst()) {
-                data[cursor.get()].indented = 0;
-            } else if (event.shiftKey) {
-                data[cursor.get()].indented = Math.max(data[cursor.get()].indented - 1, 0);
-            } else {
-                data[cursor.get()].indented = Math.min(data[cursor.get()-1].indented + 1, data[cursor.get()].indented + 1)
-            }
-            let newIndent = data[cursor.get()].indented
-            if (prevIndent !== newIndent) {
+            if (selection.hasSelection()) {
+                data = selection.indent(data, event.shiftKey ? -1 : 1)
                 _.each(events['change'], function (handler) {
                     handler()
                 })
+            } else {
+                let prevIndent = data[cursor.get()].indented
+                if (cursor.atFirst()) {
+                    data[cursor.get()].indented = 0;
+                } else if (event.shiftKey) {
+                    data[cursor.get()].indented = Math.max(data[cursor.get()].indented - 1, 0);
+                } else {
+                    data[cursor.get()].indented = Math.min(data[cursor.get()-1].indented + 1, data[cursor.get()].indented + 1)
+                }
+                let newIndent = data[cursor.get()].indented
+                if (prevIndent !== newIndent) {
+                    _.each(events['change'], function (handler) {
+                        handler()
+                    })
+                }
             }
+
             next = false
         }
         disableDragging(drake)
