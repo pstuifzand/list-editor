@@ -53,7 +53,7 @@ function editor(root, inputData) {
         $enter.each(function (index, li) {
             let value = enterData[index];
             $(li).data('id', value.id)
-                .toggleClass('selected', cursor2.atPosition(index))
+                .toggleClass('selected', cursor.atPosition(index))
                 .css('margin-left', (value.indented * 32) + 'px')
                 .find('.content')
                 .html(value.text)
@@ -62,7 +62,7 @@ function editor(root, inputData) {
         _.each(exitData, function (value, index) {
             let $li = newItem(value)
                 .css('margin-left', (value.indented * 32) + 'px')
-                .toggleClass('selected', cursor2.atPosition(index + $enter.length));
+                .toggleClass('selected', cursor.atPosition(index + $enter.length));
             $(rootElement).append($li)
         })
 
@@ -80,7 +80,7 @@ function editor(root, inputData) {
         let drake = dragula([rootElement], {});
         drake.on('drag', function (el, source) {
             start = $(rootElement).children('div.list-item').index(el)
-            if (cursor2.atPosition(start)) updateSelected = true
+            if (cursor.atPosition(start)) updateSelected = true
         })
 
         drake.on('drop', function (el, target, source, sibling) {
@@ -92,7 +92,7 @@ function editor(root, inputData) {
                 }
                 data.splice(stop, 0, ...removed)
                 if (updateSelected) {
-                    cursor2.set(stop)
+                    cursor.set(stop)
                     updateSelected = false
                 }
                 _.each(events['change'], function (handler) {
@@ -129,18 +129,18 @@ function editor(root, inputData) {
         currentEditor = null
     }
 
-    function startEditing(rootElement, data, cursor2) {
+    function startEditing(rootElement, data, cursor) {
         if (editing) return
         editing = true
 
         let elements = $(rootElement).children('div.list-item');
         let $textarea = $('<input type="text" class="input-line">');
-        $textarea.val(data[cursor2.get()].text);
-        let $selectedElement = cursor2.getSelectedElement(elements);
+        $textarea.val(data[cursor.get()].text);
+        let $selectedElement = cursor.getSelectedElement(elements);
         $selectedElement.find('.content').replaceWith($textarea)
         $selectedElement.addClass('editor');
         $textarea.focus()
-        $textarea.data(cursor2.getCurrent(data))
+        $textarea.data(cursor.getCurrent(data))
         currentEditor = $textarea
     }
 
@@ -177,16 +177,16 @@ function editor(root, inputData) {
 
     $(document).on('keydown', function (event) {
         let next = true
-        let prevSelected = cursor2.save();
+        let prevSelected = cursor.save();
         if (event.key === 'ArrowUp') {
-            cursor2.moveUp(data);
+            cursor.moveUp(data);
             next = false
         } else if (event.key === 'ArrowDown') {
-            cursor2.moveDown(data);
+            cursor.moveDown(data);
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {
             stopEditing(root, data, currentEditor);
-            data = cursor2.remove(data)
+            data = cursor.remove(data)
             next = false
             _.each(events['change'], function (handler) {
                 handler()
@@ -195,29 +195,29 @@ function editor(root, inputData) {
             stopEditing(root, data, currentEditor);
             next = false
 
-            let indent = data[cursor2.get()].indented
+            let indent = data[cursor.get()].indented
             count++
             let item = newListItem(count, indent)
 
             if (event.shiftKey) {
-                data = cursor2.insertAbove(data, item)
+                data = cursor.insertAbove(data, item)
             } else {
-                data = cursor2.insertBelow(data, item)
+                data = cursor.insertBelow(data, item)
             }
 
             _.each(events['change'], function (handler) {
                 handler()
             })
         } else if (event.key === 'Tab') {
-            let prevIndent = data[cursor2.get()].indented
-            if (cursor2.atFirst()) {
-                data[cursor2.get()].indented = 0;
+            let prevIndent = data[cursor.get()].indented
+            if (cursor.atFirst()) {
+                data[cursor.get()].indented = 0;
             } else if (event.shiftKey) {
-                data[cursor2.get()].indented = Math.max(data[cursor2.get()].indented - 1, 0);
+                data[cursor.get()].indented = Math.max(data[cursor.get()].indented - 1, 0);
             } else {
-                data[cursor2.get()].indented = Math.min(data[cursor2.get()-1].indented + 1, data[cursor2.get()].indented + 1)
+                data[cursor.get()].indented = Math.min(data[cursor.get()-1].indented + 1, data[cursor.get()].indented + 1)
             }
-            let newIndent = data[cursor2.get()].indented
+            let newIndent = data[cursor.get()].indented
             if (prevIndent !== newIndent) {
                 _.each(events['change'], function (handler) {
                     handler()
@@ -229,15 +229,15 @@ function editor(root, inputData) {
         render(root, data);
         drake = enableDragging(root)
 
-        if (cursor2.hasMoved(prevSelected)) {
+        if (cursor.hasMoved(prevSelected)) {
             if (editing && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
                 stopEditing(root, data, currentEditor);
-                startEditing(root, data, cursor2);
+                startEditing(root, data, cursor);
                 return false
             }
         }
         if (event.key === 'Enter') {
-            startEditing(root, data, cursor2);
+            startEditing(root, data, cursor);
             return false
         } else if (event.key === 'Escape') {
             stopEditing(root, data, currentEditor);
@@ -248,13 +248,13 @@ function editor(root, inputData) {
 
     $(document).on('click', 'div.list-item', function () {
         let currentIndex = $(root).children('div.list-item').index(this)
-        if (cursor2.atPosition(currentIndex) && currentEditor !== null && currentEditor.closest('.list-item')[0] === this) {
+        if (cursor.atPosition(currentIndex) && currentEditor !== null && currentEditor.closest('.list-item')[0] === this) {
             return true
         }
-        cursor2.set(currentIndex)
+        cursor.set(currentIndex)
 
         stopEditing(root, data, currentEditor)
-        startEditing(root, data, cursor2)
+        startEditing(root, data, cursor)
 
         disableDragging(drake)
         render(root, data);
@@ -266,8 +266,8 @@ function editor(root, inputData) {
     render(root, data);
     drake = enableDragging(root)
 
-    cursor2.set(0)
-    startEditing(root, data, cursor2)
+    cursor.set(0)
+    startEditing(root, data, cursor)
 
     return {
         on: on,
