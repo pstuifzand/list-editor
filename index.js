@@ -161,6 +161,15 @@ function editor(root, inputData) {
         });
     }
 
+    function copy(element) {
+        return new Promise(function (resolve, reject) {
+            let item = $(element).parents('.list-item')
+            let elements = $(root).children('div.list-item');
+            let index = elements.index(item)
+            resolve(data[index]);
+        });
+    }
+
     function on(evt, handler) {
         events[evt].push(handler)
     }
@@ -199,7 +208,6 @@ function editor(root, inputData) {
                 selection.setFirst(cursor.get())
                 selection.setLast(cursor.get()+1)
             }
-            console.log(selection.debug())
             next = false
         } else if (event.key === 'ArrowDown') {
             cursor.moveDown(data);
@@ -209,7 +217,6 @@ function editor(root, inputData) {
                 selection.setFirst(cursor.get())
                 selection.setLast(cursor.get()+1)
             }
-            console.log(selection.debug())
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {
             stopEditing(root, data, currentEditor);
@@ -309,7 +316,8 @@ function editor(root, inputData) {
 
     return {
         on: on,
-        save: save
+        save: save,
+        copy: copy
     };
 }
 

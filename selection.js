@@ -46,7 +46,6 @@ function createSelection() {
 
         indent(data, dir) {
             let removed = data.splice(first, last-first)
-            console.log('before:removed', removed)
             removed = _.reduce(removed, function (list, item) {
                 if (first === 0 && list.length === 0) {
                     item.indented = 0
@@ -66,9 +65,7 @@ function createSelection() {
                 list.push(item)
                 return list
             }, [])
-            console.log('after:removed', removed)
             data.splice(first, 0, ...removed)
-            console.log('data', data)
             return data
         },
 
