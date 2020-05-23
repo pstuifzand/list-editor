@@ -149,8 +149,8 @@ function editor(root, inputData) {
 
         let elements = $(rootElement).children('div.list-item');
         let $textarea = $('<textarea rows="1" class="input-line">');
-        $textarea.textareaAutoSize()
         $textarea.val(data[cursor.get()].text);
+        $textarea.textareaAutoSize()
         let $selectedElement = cursor.getSelectedElement(elements);
         $selectedElement.find('.content').replaceWith($textarea)
         $selectedElement.addClass('editor');
