@@ -1,8 +1,11 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import textareaAutosizeIinit from "./textarea.autosize";
 import dragula from 'dragula';
 import createCursor from './cursor';
 import createSelection from './selection';
+
+textareaAutosizeIinit($)
 
 function editor(root, inputData) {
     root.classList.add('root')
@@ -145,7 +148,8 @@ function editor(root, inputData) {
         editing = true
 
         let elements = $(rootElement).children('div.list-item');
-        let $textarea = $('<input type="text" class="input-line">');
+        let $textarea = $('<textarea rows="1" class="input-line">');
+        $textarea.textareaAutoSize()
         $textarea.val(data[cursor.get()].text);
         let $selectedElement = cursor.getSelectedElement(elements);
         $selectedElement.find('.content').replaceWith($textarea)
@@ -199,7 +203,7 @@ function editor(root, inputData) {
         return false
     });
 
-    $(document).on('keydown', 'input.input-line', function (event) {
+    $(document).on('keydown', '.input-line', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, data, $(this))
             selection.setFirst(cursor.get())
@@ -258,7 +262,7 @@ function editor(root, inputData) {
             count++
             let item = newListItem(count, indent)
 
-            if (event.shiftKey) {
+            if (event.ctrlKey) {
                 data = cursor.insertAbove(data, item)
             } else {
                 data = cursor.insertBelow(data, item)
