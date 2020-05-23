@@ -149,14 +149,15 @@ function editor(root, inputData) {
 
         let elements = $(rootElement).children('div.list-item');
         let $textarea = $('<textarea rows="1" class="input-line">');
-        $textarea.val(data[cursor.get()].text);
         $textarea.textareaAutoSize()
+        $textarea.val(data[cursor.get()].text).trigger('input')
         let $selectedElement = cursor.getSelectedElement(elements);
         $selectedElement.find('.content').replaceWith($textarea)
         $selectedElement.addClass('editor');
         $textarea.focus()
         $textarea.data(cursor.getCurrent(data))
         currentEditor = $textarea
+        return $textarea
     }
 
     function save() {
@@ -220,6 +221,7 @@ function editor(root, inputData) {
             input.value = prefix + '[[' + selection + ']]' + suffix
             input.selectionStart = prefix.length + 2
             input.selectionEnd   = input.selectionStart + selection.length
+            $(input).trigger('input')
             return false;
         }
 
@@ -328,11 +330,14 @@ function editor(root, inputData) {
         cursor.set(currentIndex)
 
         stopEditing(root, data, currentEditor)
-        startEditing(root, data, cursor)
 
         disableDragging(drake)
         render(root, data);
         drake = enableDragging(root)
+
+        const $input = startEditing(root, data, cursor)
+        $input.trigger('input')
+
         return false
     })
 
