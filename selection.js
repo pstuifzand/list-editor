@@ -64,7 +64,7 @@ function createSelection() {
                         _.last(list).fold = 'open'
                     }
 
-                    if (Math.abs(prevIndent - indent) <= 1) {
+                    if (indent < prevIndent || Math.abs(prevIndent - indent) <= 1) {
                         item.indented = indent
                     }
                 }
