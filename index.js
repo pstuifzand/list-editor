@@ -60,6 +60,12 @@ function editor(root, inputData) {
 
         $enter.each(function (index, li) {
             let value = enterData[index];
+
+            let hasChildren = false;
+            if (index+1 < last) {
+                hasChildren = value.indented < data[index+1].indented
+            }
+
             $(li).data('id', value.id)
                 .toggleClass('selected', cursor.atPosition(index))
                 .toggleClass('selection-first', selection.isSelectedFirst(index))
@@ -78,7 +84,9 @@ function editor(root, inputData) {
                 }
             }
 
-            $('.fold', $(li)).toggleClass('open', value.fold === 'open')
+            $('.fold', $(li))
+                .toggleClass('open', value.fold === 'open')
+                .toggleClass('no-children', !hasChildren)
         });
 
         _.each(exitData, function (value, index) {
