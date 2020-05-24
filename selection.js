@@ -58,6 +58,12 @@ function createSelection() {
 
                     indent = Math.max(0, indent)
 
+                    if (list.length === 0) {
+                        data[first-1].fold = 'open'
+                    } else {
+                        _.last(list).fold = 'open'
+                    }
+
                     if (Math.abs(prevIndent - indent) <= 1) {
                         item.indented = indent
                     }

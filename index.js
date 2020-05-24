@@ -14,7 +14,7 @@ function editor(root, inputData) {
     let selection = createSelection();
 
     let drake = null;
-    let data = [{id: 1, indented: 0, text: ''}];
+    let data = [{id: 1, indented: 0, text: '', fold: 'closed'}];
     if (inputData.length) {
         data = inputData
     }
@@ -27,7 +27,7 @@ function editor(root, inputData) {
     let currentEditor = null;
 
     function newListItem(count, indented) {
-        return {id: count, indented: indented, text: ''}
+        return {id: count, indented: indented, text: '', fold: 'closed'}
     }
 
     function newItem(value) {
@@ -39,6 +39,7 @@ function editor(root, inputData) {
         line.prepend($('<span class="content"></span>')
             .html(value.text))
         line.prepend($('<span class="marker"></span>'))
+        line.prepend($('<span class="fold">&#9654;</span>'))
         el.prepend(line)
         return el;
     }
@@ -55,6 +56,8 @@ function editor(root, inputData) {
         let exitData = rootData.slice($enter.length);
         let $exitEl = elements.slice($enter.length)
 
+        let hideLevel = 99999;
+
         $enter.each(function (index, li) {
             let value = enterData[index];
             $(li).data('id', value.id)
@@ -62,9 +65,20 @@ function editor(root, inputData) {
                 .toggleClass('selection-first', selection.isSelectedFirst(index))
                 .toggleClass('selection-last', selection.isSelectedLast(index))
                 .toggleClass('selection', selection.isSelected(index))
+                .toggleClass('hidden', value.indented >= hideLevel)
                 .css('margin-left', (value.indented * 32) + 'px')
                 .find('.content')
                 .html(value.text)
+
+            if (value.indented < hideLevel) {
+                if (value.fold !== 'open') {
+                    hideLevel = value.indented+1
+                } else {
+                    hideLevel = 99999;
+                }
+            }
+
+            $('.fold', $(li)).toggleClass('open', value.fold === 'open')
         });
 
         _.each(exitData, function (value, index) {
@@ -73,7 +87,18 @@ function editor(root, inputData) {
                 .toggleClass('selection-first', selection.isSelectedFirst(index))
                 .toggleClass('selection-last', selection.isSelectedLast(index))
                 .toggleClass('selection', selection.isSelected(index))
-                .toggleClass('selected', cursor.atPosition(index + $enter.length));
+                .toggleClass('selected', cursor.atPosition(index + $enter.length))
+                .toggleClass('hidden', value.indented >= hideLevel);
+
+            if (value.indented < hideLevel) {
+                if (value.fold === 'open') {
+                    hideLevel = 99999;
+                } else {
+                    hideLevel = value.indented+1
+                }
+            }
+
+            $('.fold', $li).toggleClass('open', value.fold === 'open')
             $(rootElement).append($li)
         })
 
@@ -287,8 +312,9 @@ function editor(root, inputData) {
                 if (cursor.atFirst()) {
                     data[cursor.get()].indented = 0;
                 } else if (event.shiftKey) {
-                    data[cursor.get()].indented = Math.max(data[cursor.get()].indented - 1, 0);
+                    data[cursor.get()].indented = Math.max(data[cursor.get()].indented - 1, 0)
                 } else {
+                    data[cursor.get()-1].fold = 'open'
                     data[cursor.get()].indented = Math.min(data[cursor.get()-1].indented + 1, data[cursor.get()].indented + 1)
                 }
                 let newIndent = data[cursor.get()].indented
@@ -340,6 +366,21 @@ function editor(root, inputData) {
 
         return false
     })
+
+    $(document).on('click', '.fold', function() {
+        let open = !$(this).hasClass('open');
+        $(this).toggleClass('open', open)
+        $(this).toggleClass('closed', !open)
+
+        let item = $(this).parents('.list-item')
+        let elements = $(root).children('div.list-item');
+        let index = elements.index(item)
+        data[index].fold = open ? 'open' : 'closed'
+
+        disableDragging(drake)
+        render(root, data);
+        drake = enableDragging(root)
+    });
 
     disableDragging(drake)
     render(root, data);
