@@ -18,11 +18,7 @@ function editor(root, inputData) {
 
     function createStore(inputData) {
         let data = [
-            {indented: 0, text: 'test1', fold: 'open'},
-            {indented: 1, text: 'test11', fold: 'open'},
-            {indented: 1, text: 'test12', fold: 'open'},
-            {indented: 1, text: 'test13', fold: 'open'},
-            {indented: 0, text: 'test2', fold: 'open'},
+            {indented: 0, text: '', fold: 'open'},
         ];
         if (inputData.length) {
             data = inputData
