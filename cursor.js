@@ -17,43 +17,37 @@ function createCursor(start) {
         hasMoved(saved) {
             return cursor !== saved.get()
         },
-        getCurrent(data) {
-            return {
-                id: data[cursor].id,
-                indented: data[cursor].indented,
-                selected: cursor,
-            }
+        getCurrent(store) {
+            let id = store.currentID(cursor)
+            return store.value(id)
         },
-        getSelectedElement(elements) {
+        getCurrentElement(elements) {
             return elements.slice(cursor, cursor + 1);
         },
         save() {
             return createCursor(cursor);
         },
-        moveUp(data) {
+        moveUp(store) {
             cursor--;
             if (cursor < 0) {
-                cursor = data.length - 1;
+                cursor = store.length() - 1;
             }
         },
-        moveDown(data) {
+        moveDown(store) {
             cursor++;
-            if (cursor >= data.length) {
+            if (cursor >= store.length()) {
                 cursor = 0;
             }
         },
-        remove(data) {
-            data.splice(cursor, 1)
-            return data
+        remove(store) {
+            store.remove(cursor, 1)
         },
-        insertAbove(data, item) {
-            data.splice(cursor, 0, item);
-            return data
+        insertAbove(store, item) {
+            store.insertBefore(store.currentID(cursor), item)
         },
-        insertBelow(data, item) {
-            cursor++;
-            data.splice(cursor, 0, item);
-            return data
+        insertBelow(store, item) {
+            store.insertAfter(store.currentID(cursor), item)
+            cursor++
         }
     };
 }

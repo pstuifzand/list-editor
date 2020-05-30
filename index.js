@@ -4,6 +4,7 @@ import textareaAutosizeIinit from "./textarea.autosize";
 import dragula from 'dragula';
 import createCursor from './cursor';
 import createSelection from './selection';
+import Store from './store';
 
 textareaAutosizeIinit($)
 
@@ -14,11 +15,23 @@ function editor(root, inputData) {
     let selection = createSelection();
 
     let drake = null;
-    let data = [{id: 1, indented: 0, text: '', fold: 'closed'}];
-    if (inputData.length) {
-        data = inputData
+
+    function createStore(inputData) {
+        let data = [
+            {indented: 0, text: 'test1', fold: 'open'},
+            {indented: 1, text: 'test11', fold: 'open'},
+            {indented: 1, text: 'test12', fold: 'open'},
+            {indented: 1, text: 'test13', fold: 'open'},
+            {indented: 0, text: 'test2', fold: 'open'},
+        ];
+        if (inputData.length) {
+            data = inputData
+        }
+        return Store(data);
     }
-    let count = data.length;
+
+    let store = createStore(inputData);
+
     let events = {
         change: []
     }
@@ -26,8 +39,8 @@ function editor(root, inputData) {
     let editing = false
     let currentEditor = null;
 
-    function newListItem(count, indented) {
-        return {id: count, indented: indented, text: '', fold: 'closed'}
+    function newListItem(indented) {
+        return {indented: indented, text: '', fold: 'closed'}
     }
 
     function newItem(value) {
@@ -44,9 +57,13 @@ function editor(root, inputData) {
         return el;
     }
 
+    /**
+     * @param {Element} rootElement
+     * @param rootData
+     */
     function render(rootElement, rootData) {
         let first = 0;
-        let last = rootData.length;
+        let last = rootData.length();
 
         let elements = $(rootElement).children('div.list-item');
 
@@ -59,11 +76,13 @@ function editor(root, inputData) {
         let hideLevel = 99999;
 
         $enter.each(function (index, li) {
-            let value = enterData[index];
+            let storeId = enterData[index]
+            let value = rootData.value(storeId)
 
             let hasChildren = false;
-            if (index+1 < last) {
-                hasChildren = value.indented < data[index+1].indented
+            if (index + 1 < last) {
+                let next = rootData.afterValue(storeId)
+                hasChildren = next && (value.indented < next.indented)
             }
 
             $(li).data('id', value.id)
@@ -78,7 +97,7 @@ function editor(root, inputData) {
 
             if (value.indented < hideLevel) {
                 if (value.fold !== 'open') {
-                    hideLevel = value.indented+1
+                    hideLevel = value.indented + 1
                 } else {
                     hideLevel = 99999;
                 }
@@ -89,7 +108,8 @@ function editor(root, inputData) {
                 .toggleClass('no-children', !hasChildren)
         });
 
-        _.each(exitData, function (value, index) {
+        _.each(exitData, function (storeId, index) {
+            let value = rootData.value(storeId)
             let $li = newItem(value)
                 .css('margin-left', (value.indented * 32) + 'px')
                 .toggleClass('selection-first', selection.isSelectedFirst(index))
@@ -102,7 +122,7 @@ function editor(root, inputData) {
                 if (value.fold === 'open') {
                     hideLevel = 99999;
                 } else {
-                    hideLevel = value.indented+1
+                    hideLevel = value.indented + 1
                 }
             }
 
@@ -118,39 +138,36 @@ function editor(root, inputData) {
     }
 
     function enableDragging(rootElement) {
-        let start = -1;
-        let updateSelected = false
+        let drake = dragula([rootElement], {
+            moves: function (el, container, handle) {
+                return handle.classList.contains('marker')
+            }
+        });
 
-        let drake = dragula([rootElement], {});
+        let start = -1;
+        let startID = null;
+
         drake.on('drag', function (el, source) {
-            start = $(rootElement).children('div.list-item').index(el)
-            if (cursor.atPosition(start)) updateSelected = true
+            startID = $(el).data('id')
         })
 
         drake.on('drop', function (el, target, source, sibling) {
-            let stop = $(target).children('div.list-item').index(el)
-            if (start >= 0) {
-                const removed = data.splice(start, 1)
-                if (start === stop) {
-                    return;
-                }
-                data.splice(stop, 0, ...removed)
-                if (stop === 0 && removed.length > 0) {
-                    removed[0].indented = 0
-                }
-                if (updateSelected) {
-                    cursor.set(stop)
-                    updateSelected = false
-                }
-                _.each(events['change'], function (handler) {
-                    handler()
-                })
-            }
+            let stopID = $(sibling).data('id')
+            console.log(startID, stopID)
+            let id = store.moveBefore(startID, stopID)
+
+            let position = store.index(id);
+            cursor.set(position)
+            selection.selectOne(position, store)
+
+            _.each(events['change'], function (handler) {
+                handler()
+            })
         })
         return drake;
     }
 
-    function stopEditing(rootElement, data, element) {
+    function stopEditing(rootElement, store, element) {
         if (!editing) return
         if (element === null) {
             editing = false
@@ -160,9 +177,10 @@ function editor(root, inputData) {
 
         let text = element.val()
         $(element).closest('.list-item').removeClass('editor');
-        data[element.data('selected')] = _.merge(data[element.data('selected')], {
-            id: element.data('id'),
-            text: text
+        store.update(element.data('id'), (value) => {
+            return _.merge(value, {
+                text: text
+            })
         })
 
         _.each(events['change'], function (handler) {
@@ -176,35 +194,40 @@ function editor(root, inputData) {
         currentEditor = null
     }
 
-    function startEditing(rootElement, data, cursor) {
+    /**
+     * @param {Element} rootElement
+     * @param {Store} store
+     * @param cursor
+     * @returns {jQuery|HTMLElement}
+     */
+    function startEditing(rootElement, store, cursor) {
         if (editing) return
         editing = true
 
         let elements = $(rootElement).children('div.list-item');
         let $textarea = $('<textarea rows="1" class="input-line">');
         $textarea.textareaAutoSize()
-        $textarea.val(data[cursor.get()].text).trigger('input')
-        let $selectedElement = cursor.getSelectedElement(elements);
-        $selectedElement.find('.content').replaceWith($textarea)
-        $selectedElement.addClass('editor');
+        $textarea.val(cursor.getCurrent(store).text).trigger('input')
+        let currentElement = cursor.getCurrentElement(elements);
+        currentElement.find('.content').replaceWith($textarea)
+        currentElement.addClass('editor');
         $textarea.focus()
-        $textarea.data(cursor.getCurrent(data))
+        $textarea.data(cursor.getCurrent(store))
         currentEditor = $textarea
         return $textarea
     }
 
     function save() {
         return new Promise(function (resolve, reject) {
-            resolve(data);
+            resolve(store.debug().result);
         });
     }
 
     function copy(element) {
         return new Promise(function (resolve, reject) {
             let item = $(element).parents('.list-item')
-            let elements = $(root).children('div.list-item');
-            let index = elements.index(item)
-            resolve(data[index]);
+            let id = item.data('id')
+            resolve(store.value(id));
         });
     }
 
@@ -212,36 +235,38 @@ function editor(root, inputData) {
         events[evt].push(handler)
     }
 
-    $(document).on('paste', 'input.input-line', function (event) {
+    $(document).on('paste', '.input-line', function (event) {
         let parentItem = $(this).parents('.list-item')
         let index = $(root).children('div.list-item').index(parentItem)
         let pastedData = event.originalEvent.clipboardData.getData('text')
         let lines = pastedData.split(/\n/)
+        if (lines.length === 1) {
+            return true;
+        }
 
-        let baseIndent = data[index].indented
+        let currentID = store.currentID(index);
+        let baseIndent = store.value(currentID).indented
 
         let newItems = _.filter(_.map(lines, function (line) {
-            if (line.length == 0) return;
+            if (line.length === 0) return;
             let matches = line.match(/(\s{4})/g)
             let relIndent = matches ? matches.length : 0;
-
-            count++
-            let newItem = newListItem(count, baseIndent+relIndent)
+            let newItem = newListItem(baseIndent + relIndent)
             newItem.text = line.replace(/^\s+/, '')
             return newItem
         }))
-        data.splice(index+1, 0, ...newItems)
+        store.insertAfter(currentID, ...newItems)
+
         disableDragging(drake)
-        render(root, data);
+        render(root, store);
         drake = enableDragging(root)
         return false
     });
 
     $(document).on('keydown', '.input-line', function (event) {
         if (event.key === 'Escape') {
-            stopEditing(root, data, $(this))
-            selection.setFirst(cursor.get())
-            selection.setLast(cursor.get()+1)
+            stopEditing(root, store, $(this))
+            selection.selectOne(cursor.get(), store)
             return false
         }
 
@@ -253,7 +278,7 @@ function editor(root, inputData) {
             let suffix = val.substring(input.selectionEnd)
             input.value = prefix + '[[' + selection + ']]' + suffix
             input.selectionStart = prefix.length + 2
-            input.selectionEnd   = input.selectionStart + selection.length
+            input.selectionEnd = input.selectionStart + selection.length
             $(input).trigger('input')
             return false;
         }
@@ -265,67 +290,78 @@ function editor(root, inputData) {
         let next = true
         let prevSelected = cursor.save();
         if (event.key === 'ArrowUp') {
-            cursor.moveUp(data);
+            cursor.moveUp(store);
             if (event.shiftKey) {
-                selection.include(cursor.get())
+                selection.include(cursor.get(), store)
             } else {
-                selection.setFirst(cursor.get())
-                selection.setLast(cursor.get()+1)
+                selection.selectOne(cursor.get(), store)
             }
             next = false
         } else if (event.key === 'ArrowDown') {
-            cursor.moveDown(data);
+            cursor.moveDown(store);
             if (event.shiftKey) {
-                selection.include(cursor.get())
+                selection.include(cursor.get(), store)
             } else {
-                selection.setFirst(cursor.get())
-                selection.setLast(cursor.get()+1)
+                selection.selectOne(cursor.get(), store)
             }
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {
-            stopEditing(root, data, currentEditor);
-            data = cursor.remove(data)
+            stopEditing(root, store, currentEditor);
+            if (selection.hasSelection()) {
+                selection.remove(store)
+                // FIXME: adjust cursor
+            } else {
+                cursor.remove(store)
+            }
             next = false
             _.each(events['change'], function (handler) {
                 handler()
             })
         } else if (event.key === 'Enter') {
-            stopEditing(root, data, currentEditor);
+            stopEditing(root, store, currentEditor);
             next = false
 
-            let indent = data[cursor.get()].indented
-            count++
-            let item = newListItem(count, indent)
+            let indent = cursor.getCurrent(store).indented
+            let item = newListItem(indent)
 
             if (event.ctrlKey) {
-                data = cursor.insertAbove(data, item)
+                cursor.insertAbove(store, item)
             } else {
-                data = cursor.insertBelow(data, item)
+                cursor.insertBelow(store, item)
             }
 
-            selection.setFirst(cursor.get())
-            selection.setLast(cursor.get()+1)
+            selection.selectOne(cursor.get(), store)
 
             _.each(events['change'], function (handler) {
                 handler()
             })
         } else if (event.key === 'Tab') {
             if (selection.hasSelection()) {
-                data = selection.indent(data, event.shiftKey ? -1 : 1)
+                selection.indent(store, event.shiftKey ? -1 : 1)
                 _.each(events['change'], function (handler) {
                     handler()
                 })
             } else {
-                let prevIndent = data[cursor.get()].indented
+                let prevIndent = cursor.getCurrent(store).indented
                 if (cursor.atFirst()) {
-                    data[cursor.get()].indented = 0;
+                    store.update(cursor.getCurrent(store).id, function (item) {
+                        item.indented = 0
+                        return item
+                    })
                 } else if (event.shiftKey) {
-                    data[cursor.get()].indented = Math.max(data[cursor.get()].indented - 1, 0)
+                    store.update(cursor.getId(), function (value) {
+                        value.indented = Math.max(value.indented - 1, 0)
+                        return value
+                    })
                 } else {
-                    data[cursor.get()-1].fold = 'open'
-                    data[cursor.get()].indented = Math.min(data[cursor.get()-1].indented + 1, data[cursor.get()].indented + 1)
+                    // FIXME: fold previous open
+                    // data[cursor.get() - 1].fold = 'open'
+                    store.update(cursor.getId(), function (value, prev) {
+                        value.indented = Math.min(prev.indented + 1, value.indented + 1)
+                        return value
+                    })
                 }
-                let newIndent = data[cursor.get()].indented
+                let newIndent = cursor.getCurrent(store).indented
                 if (prevIndent !== newIndent) {
                     _.each(events['change'], function (handler) {
                         handler()
@@ -336,46 +372,53 @@ function editor(root, inputData) {
             next = false
         }
         disableDragging(drake)
-        render(root, data);
+        render(root, store);
         drake = enableDragging(root)
 
         if (cursor.hasMoved(prevSelected)) {
-            if (editing && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
-                stopEditing(root, data, currentEditor);
-                startEditing(root, data, cursor);
+            if (!selection.hasSelection() && editing && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+                stopEditing(root, store, currentEditor);
+                startEditing(root, store, cursor);
                 return false
+            } else if (selection.hasSelection()) {
+                stopEditing(root, store, currentEditor);
             }
         }
         if (event.key === 'Enter') {
-            startEditing(root, data, cursor);
+            startEditing(root, store, cursor);
             return false
         } else if (event.key === 'Escape') {
-            stopEditing(root, data, currentEditor);
+            stopEditing(root, store, currentEditor);
             return false
         }
         return next
     })
+    $(document).on('click', '.marker', function () {
+        stopEditing(root, store, $(this).parents('div.list-item'));
+        return false;
+    });
 
     $(document).on('click', 'div.list-item', function () {
         let currentIndex = $(root).children('div.list-item').index(this)
         if (cursor.atPosition(currentIndex) && currentEditor !== null && currentEditor.closest('.list-item')[0] === this) {
             return true
         }
-        cursor.set(currentIndex)
+        stopEditing(root, store, currentEditor)
 
-        stopEditing(root, data, currentEditor)
+        cursor.set(currentIndex)
+        selection.selectOne(cursor.get(), store)
 
         disableDragging(drake)
-        render(root, data);
+        render(root, store);
         drake = enableDragging(root)
 
-        const $input = startEditing(root, data, cursor)
+        const $input = startEditing(root, store, cursor)
         $input.trigger('input')
 
         return false
     })
 
-    $(document).on('click', '.fold', function() {
+    $(document).on('click', '.fold', function () {
         let open = !$(this).hasClass('open');
         $(this).toggleClass('open', open)
         $(this).toggleClass('closed', !open)
@@ -383,24 +426,27 @@ function editor(root, inputData) {
         let item = $(this).parents('.list-item')
         let elements = $(root).children('div.list-item');
         let index = elements.index(item)
-        data[index].fold = open ? 'open' : 'closed'
+        store.update(item.data('id'), function (item) {
+            item.fold = open ? 'open' : 'closed'
+            return item
+        })
 
         disableDragging(drake)
-        render(root, data);
+        render(root, store);
         drake = enableDragging(root)
     });
 
     disableDragging(drake)
-    render(root, data);
+    render(root, store);
     drake = enableDragging(root)
 
     cursor.set(0)
-    startEditing(root, data, cursor)
+    startEditing(root, store, cursor)
 
     return {
-        on: on,
-        save: save,
-        copy: copy
+        on,
+        save,
+        copy
     };
 }
 
