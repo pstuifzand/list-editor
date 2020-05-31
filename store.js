@@ -91,9 +91,9 @@ function Store(inputData) {
         if (!item.id || item.id[0] !== '_') {
             let newId = ID();
             item.id = newId
-            values[newId] = item;
             id = newId
         }
+        values[id] = item;
         idList.push(id)
         return id;
     }
