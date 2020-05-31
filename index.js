@@ -273,7 +273,7 @@ function editor(root, inputData) {
             let selection = val.substring(input.selectionStart, input.selectionEnd)
             let suffix = val.substring(input.selectionEnd)
             input.value = prefix + '[' + selection + ']' + suffix
-            input.selectionStart = prefix.length + 2
+            input.selectionStart = prefix.length + 1
             input.selectionEnd = input.selectionStart + selection.length
             $(input).trigger('input')
             return false;
