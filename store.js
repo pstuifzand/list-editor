@@ -87,11 +87,15 @@ function Store(inputData) {
      * @returns {string}
      */
     function append(item) {
-        let newId = ID();
-        item.id = newId
-        values[newId] = item;
-        idList.push(newId)
-        return newId;
+        let id = item.id;
+        if (!item.id || item.id[0] !== '_') {
+            let newId = ID();
+            item.id = newId
+            values[newId] = item;
+            id = newId
+        }
+        idList.push(id)
+        return id;
     }
 
     /**
