@@ -297,6 +297,10 @@ function editor(root, inputData) {
     });
 
     $(document).on('keydown', function (event) {
+        let tag = event.target.tagName.toLowerCase();
+        if (tag === 'textarea' && currentEditor[0].value.substring(0, 3) === '```') {
+            return true
+        }
         let next = true
         let prevSelected = cursor.save();
         if (event.key === 'ArrowUp') {
