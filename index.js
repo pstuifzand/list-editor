@@ -29,7 +29,9 @@ function editor(root, inputData) {
     let store = createStore(inputData);
 
     let events = {
-        change: []
+        change: [],
+        'start-editing': [],
+        'stop-editing': [],
     }
 
     let editing = false
@@ -156,9 +158,7 @@ function editor(root, inputData) {
             cursor.set(position)
             selection.selectOne(position, store)
 
-            _.each(events['change'], function (handler) {
-                handler()
-            })
+            trigger('change')
         })
         return drake;
     }
@@ -179,13 +179,12 @@ function editor(root, inputData) {
             })
         })
 
-        _.each(events['change'], function (handler) {
-            handler()
-        })
+        trigger('change')
 
         let $span = $('<span class="content">');
         $span.html(text)
         element.replaceWith($span);
+        trigger('stop-editing', currentEditor[0])
         editing = false
         currentEditor = null
     }
@@ -210,6 +209,7 @@ function editor(root, inputData) {
         $textarea.focus()
         $textarea.data(cursor.getCurrent(store))
         currentEditor = $textarea
+        trigger('start-editing', currentEditor[0])
         return $textarea
     }
 
@@ -228,8 +228,18 @@ function editor(root, inputData) {
     }
 
     function on(evt, handler) {
+        console.log(evt)
         events[evt].push(handler)
     }
+
+    function trigger(event) {
+        let args = [...arguments]
+        args.splice(0, 1)
+        _.each(events[event], function (handler) {
+            handler(...args)
+        })
+    }
+
 
     $(document).on('paste', '.input-line', function (event) {
         let parentItem = $(this).parents('.list-item')
@@ -310,9 +320,8 @@ function editor(root, inputData) {
                 cursor.remove(store)
             }
             next = false
-            _.each(events['change'], function (handler) {
-                handler()
-            })
+
+            trigger('change');
         } else if (event.key === 'Enter') {
             stopEditing(root, store, currentEditor);
             next = false
@@ -328,15 +337,11 @@ function editor(root, inputData) {
 
             selection.selectOne(cursor.get(), store)
 
-            _.each(events['change'], function (handler) {
-                handler()
-            })
+            trigger('change')
         } else if (event.key === 'Tab') {
             if (selection.hasSelection()) {
                 selection.indent(store, event.shiftKey ? -1 : 1)
-                _.each(events['change'], function (handler) {
-                    handler()
-                })
+                trigger('change')
             } else {
                 let prevIndent = cursor.getCurrent(store).indented
                 if (cursor.atFirst()) {
@@ -359,9 +364,7 @@ function editor(root, inputData) {
                 }
                 let newIndent = cursor.getCurrent(store).indented
                 if (prevIndent !== newIndent) {
-                    _.each(events['change'], function (handler) {
-                        handler()
-                    })
+                    trigger('change')
                 }
             }
 
