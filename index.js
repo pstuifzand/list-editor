@@ -151,6 +151,10 @@ function editor(root, inputData) {
 
         drake.on('drop', function (el, target, source, sibling) {
             let stopID = $(sibling).data('id')
+            if (startID === stopID) {
+                return
+            }
+
             console.log(startID, stopID)
             let id = store.moveBefore(startID, stopID)
 
