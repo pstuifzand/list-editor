@@ -313,7 +313,7 @@ function editor(root, inputData) {
             if (event.shiftKey) {
                 selection.include(cursor.get(), store)
             } else {
-                selection.selectOne(cursor.get(), store)
+                selection.selectNothing(cursor.get())
             }
             next = false
         } else if (event.key === 'ArrowDown') {
@@ -321,7 +321,7 @@ function editor(root, inputData) {
             if (event.shiftKey) {
                 selection.include(cursor.get(), store)
             } else {
-                selection.selectOne(cursor.get(), store)
+                selection.selectNothing(cursor.get())
             }
             next = false
         } else if (event.shiftKey && event.key === 'Delete') {

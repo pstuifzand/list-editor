@@ -21,12 +21,17 @@ function createSelection() {
             last = first + 1
         },
 
+        selectNothing(f) {
+            first = f
+            last = f
+        },
+
         remove(store) {
             store.remove(first, last - first)
         },
 
         hasSelection() {
-            return first >= 0 && last >= 0
+            return first >= 0 && last >= 0 && first !== last
         },
 
         isSelected(line) {
