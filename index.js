@@ -246,6 +246,11 @@ function editor(root, inputData) {
 
 
     $(document).on('paste', '.input-line', function (event) {
+        let tag = event.target.tagName.toLowerCase();
+        if (tag === 'textarea' && currentEditor[0].value.substring(0, 3) === '```') {
+            return true
+        }
+
         let parentItem = $(this).parents('.list-item')
         let index = $(root).children('div.list-item').index(parentItem)
         let pastedData = event.originalEvent.clipboardData.getData('text')
