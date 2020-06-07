@@ -38,7 +38,7 @@ function editor(root, inputData) {
     let currentEditor = null;
 
     function newListItem(indented) {
-        return {indented: indented, text: '', fold: 'closed'}
+        return {indented: indented, text: '', fold: 'open'}
     }
 
     function newItem(value) {
