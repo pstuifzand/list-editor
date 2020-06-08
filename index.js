@@ -356,14 +356,16 @@ function editor(root, inputData, options) {
             return false
         }
 
-        if (event.key === '[') {
+        let mirror = {'[':']','=':'='}
+
+        if (mirror.hasOwnProperty(event.key)) {
             let input = this
             let val = input.value
             let prefix = val.substring(0, input.selectionStart)
             let selection = val.substring(input.selectionStart, input.selectionEnd)
             let suffix = val.substring(input.selectionEnd)
-            input.value = prefix + '[' + selection + ']' + suffix
-            input.selectionStart = prefix.length + 1
+            input.value = prefix + event.key + selection + mirror[event.key] + suffix
+            input.selectionStart = prefix.length + event.key.length
             input.selectionEnd = input.selectionStart + selection.length
             $(input).trigger('input')
             return false;

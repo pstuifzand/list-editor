@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Make links in content clickable
+- Add "=" handling of selected text.
+
+## [0.7.1] - 2020-06-08
+
 - Add options
 - Add transform function to options
 
