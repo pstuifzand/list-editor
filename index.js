@@ -1,18 +1,27 @@
-import _ from 'lodash';
-import $ from 'jquery';
-import textareaAutosizeIinit from "./textarea.autosize";
-import dragula from 'dragula';
-import createCursor from './cursor';
-import createSelection from './selection';
-import Store from './store';
+import _ from 'lodash'
+import $ from 'jquery'
+import he from 'he'
+import textareaAutosizeIinit from "./textarea.autosize"
+import dragula from 'dragula'
+import createCursor from './cursor'
+import createSelection from './selection'
+import Store from './store'
 
 textareaAutosizeIinit($)
 
-function editor(root, inputData) {
+function editor(root, inputData, options) {
     root.classList.add('root')
 
-    let cursor = createCursor();
-    let selection = createSelection();
+    let cursor = createCursor()
+    let selection = createSelection()
+
+    let defaults = {
+        transform(text, callback) {
+            return callback(he.encode(text))
+        }
+    }
+
+    options = _.merge(defaults, options)
 
     let drake = null;
 
@@ -47,8 +56,11 @@ function editor(root, inputData) {
             .data('indented', value.indented)
             .css('margin-left', (value.indented * 32) + 'px')
         let line = $('<div class="line">')
-        line.prepend($('<span class="content"></span>')
-            .html(value.text))
+        line.prepend(
+            options.transform(value.text, (text) => {
+                return $('<span class="content"></span>').html(text)
+            })
+        )
         line.prepend($('<span class="marker"></span>'))
         line.prepend($('<span class="fold">&#9654;</span>'))
         el.prepend(line)
@@ -83,7 +95,7 @@ function editor(root, inputData) {
                 hasChildren = next && (value.indented < next.indented)
             }
 
-            $(li).data('id', value.id)
+            let $li = $(li).data('id', value.id)
                 .toggleClass('selected', cursor.atPosition(index))
                 .toggleClass('selection-first', selection.isSelectedFirst(index))
                 .toggleClass('selection-last', selection.isSelectedLast(index))
@@ -91,7 +103,10 @@ function editor(root, inputData) {
                 .toggleClass('hidden', value.indented >= hideLevel)
                 .css('margin-left', (value.indented * 32) + 'px')
                 .find('.content')
-                .html(value.text)
+
+            options.transform(value.text, (text) => {
+                return $li.html(text)
+            })
 
             if (value.indented < hideLevel) {
                 if (value.fold !== 'open') {
@@ -186,7 +201,9 @@ function editor(root, inputData) {
         trigger('change')
 
         let $span = $('<span class="content">');
-        $span.html(text)
+        options.transform(text, (text) => {
+            return $span.html(text)
+        })
         element.replaceWith($span);
         trigger('stop-editing', currentEditor[0])
         editing = false
