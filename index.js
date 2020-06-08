@@ -481,7 +481,12 @@ function editor(root, inputData, options) {
         return false;
     });
 
-    $(document).on('click', 'div.list-item', function () {
+    $(document).on('click', '.content a', function (event) {
+        event.stopPropagation()
+        return true
+    })
+
+    $(document).on('click', '.list-item', function () {
         let currentIndex = $(root).children('div.list-item').index(this)
         if (cursor.atPosition(currentIndex) && currentEditor !== null && currentEditor.closest('.list-item')[0] === this) {
             return true
