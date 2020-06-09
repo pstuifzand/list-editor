@@ -355,22 +355,6 @@ function editor(root, inputData, options) {
             selection.selectOne(cursor.get(), store)
             return false
         }
-
-        let mirror = {'[':']','=':'='}
-
-        if (mirror.hasOwnProperty(event.key)) {
-            let input = this
-            let val = input.value
-            let prefix = val.substring(0, input.selectionStart)
-            let selection = val.substring(input.selectionStart, input.selectionEnd)
-            let suffix = val.substring(input.selectionEnd)
-            input.value = prefix + event.key + selection + mirror[event.key] + suffix
-            input.selectionStart = prefix.length + event.key.length
-            input.selectionEnd = input.selectionStart + selection.length
-            $(input).trigger('input')
-            return false;
-        }
-
         return true
     });
 
