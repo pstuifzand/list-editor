@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.4] - 2020-06-11
+
+- Add .no-children, .open to .list-item, to simplify css
+
 ## [0.7.3] - 2020-06-09
 
 - Remove mirroring of characters
