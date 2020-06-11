@@ -119,6 +119,9 @@ function editor(root, inputData, options) {
             $('.fold', $(li))
                 .toggleClass('open', value.fold === 'open')
                 .toggleClass('no-children', !hasChildren)
+
+            $(li).toggleClass('no-children', !hasChildren)
+                .toggleClass('open', value.fold === 'open')
         });
 
         _.each(exitData, function (storeId, index) {
@@ -131,6 +134,12 @@ function editor(root, inputData, options) {
                 .toggleClass('selected', cursor.atPosition(index + $enter.length))
                 .toggleClass('hidden', value.indented >= hideLevel);
 
+            let hasChildren = false;
+            if (enterData.length + index + 1 < last) {
+                let next = rootData.afterValue(storeId)
+                hasChildren = next && (value.indented < next.indented)
+            }
+
             if (value.indented < hideLevel) {
                 if (value.fold === 'open') {
                     hideLevel = 99999;
@@ -139,7 +148,13 @@ function editor(root, inputData, options) {
                 }
             }
 
-            $('.fold', $li).toggleClass('open', value.fold === 'open')
+            $('.fold', $li)
+                .toggleClass('open', value.fold === 'open')
+                .toggleClass('no-children', !hasChildren)
+
+            $li.toggleClass('no-children', !hasChildren)
+                .toggleClass('open', value.fold === 'open')
+
             $(rootElement).append($li)
         })
 
