@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.5] - 2020-06-11
+
+- Add classes for borders when >= 1 indented
+- Fixed bug where content was removed, when the marker was clicked on the 
+  line with the active editor
+
 ## [0.7.4] - 2020-06-11
 
 - Add .no-children, .open to .list-item, to simplify css
