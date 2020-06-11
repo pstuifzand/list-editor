@@ -480,7 +480,7 @@ function editor(root, inputData, options) {
         return next
     })
     $(document).on('click', '.marker', function () {
-        stopEditing(root, store, $(this).parents('div.list-item'));
+        stopEditing(root, store, $(this).next('textarea'));
         return false;
     });
 
