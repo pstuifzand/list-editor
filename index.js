@@ -101,6 +101,7 @@ function editor(root, inputData, options) {
                 .toggleClass('selection-last', selection.isSelectedLast(index))
                 .toggleClass('selection', selection.isSelected(index))
                 .toggleClass('hidden', value.indented >= hideLevel)
+                .toggleClass('border', value.indented >= 1)
                 .css('margin-left', (value.indented * 32) + 'px')
                 .find('.content')
 
@@ -132,6 +133,7 @@ function editor(root, inputData, options) {
                 .toggleClass('selection-last', selection.isSelectedLast(index))
                 .toggleClass('selection', selection.isSelected(index))
                 .toggleClass('selected', cursor.atPosition(index + $enter.length))
+                .toggleClass('border', value.indented >= 1)
                 .toggleClass('hidden', value.indented >= hideLevel);
 
             let hasChildren = false;
