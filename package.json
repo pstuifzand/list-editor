@@ -1,6 +1,6 @@
 {
   "name": "wiki-list-editor",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "Simple editor of lists",
   "author": "Peter Stuifzand <peter@p83.nl>",
   "main": "index.js",

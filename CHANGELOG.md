@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.6] - 2020-06-15
+
+- Remove the jump from the textarea with multiple lines when moving to it.
+- Use the indent of the next item when it larger then the current indent, but use the
+  current indent otherwise.
+
 ## [0.7.5] - 2020-06-11
 
 - Add classes for borders when >= 1 indented
