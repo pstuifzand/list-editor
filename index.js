@@ -262,7 +262,7 @@ function editor(root, inputData, options) {
             let items = store.debug().result;
 
             let top = (stack) => {
-                return stack[stack.length-1];
+                return stack[stack.length - 1];
             }
 
             let pop = (stack) => {
@@ -287,7 +287,7 @@ function editor(root, inputData, options) {
                     let newItem = item
                     pop(stack)
                     let cur = top(stack)
-                    cur[cur.length-1].children = children
+                    cur[cur.length - 1].children = children
                     if (top(stack)[0].indented === itemIndented)
                         top(stack).push(item)
                     else
@@ -304,7 +304,7 @@ function editor(root, inputData, options) {
                 let children = top(stack)
                 pop(stack)
                 let item = top(stack)
-                item[item.length-1].children = children
+                item[item.length - 1].children = children
             }
 
             resolve(top(stack))
