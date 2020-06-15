@@ -411,12 +411,18 @@ function editor(root, inputData, options) {
             stopEditing(root, store, currentEditor);
             next = false
 
-            let indent = cursor.getCurrent(store).indented
-            let item = newListItem(indent)
-
             if (event.ctrlKey) {
+                let id = store.currentID(cursor.get())
+                let current = store.value(id)
+                let indent = current.indented
+                let item = newListItem(indent)
                 cursor.insertAbove(store, item)
             } else {
+                let currentValue = store.value(store.currentID(cursor.get()));
+                let current = currentValue ? currentValue.indented : 0
+                let next = cursor.get() + 1 < store.length() ? store.value(store.currentID(cursor.get() + 1)).indented : current
+                let indent = next > current ? next : current
+                let item = newListItem(indent)
                 cursor.insertBelow(store, item)
             }
 
