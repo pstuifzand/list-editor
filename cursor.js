@@ -28,16 +28,10 @@ function createCursor(start) {
             return createCursor(cursor);
         },
         moveUp(store) {
-            cursor--;
-            if (cursor < 0) {
-                cursor = store.length() - 1;
-            }
+            cursor = store.prevCursorPosition(cursor)
         },
         moveDown(store) {
-            cursor++;
-            if (cursor >= store.length()) {
-                cursor = 0;
-            }
+            cursor = store.nextCursorPosition(cursor)
         },
         remove(store) {
             store.remove(cursor, 1)

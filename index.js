@@ -104,6 +104,7 @@ function editor(root, inputData, options) {
                 .toggleClass('border', value.indented >= 1)
                 .css('margin-left', (value.indented * 32) + 'px')
                 .find('.content')
+            value.hidden = value.indented >= hideLevel
 
             options.transform(value.text, (text) => {
                 return $li.html(text)
@@ -135,6 +136,7 @@ function editor(root, inputData, options) {
                 .toggleClass('selected', cursor.atPosition(index + $enter.length))
                 .toggleClass('border', value.indented >= 1)
                 .toggleClass('hidden', value.indented >= hideLevel);
+            value.hidden = value.indented >= hideLevel
 
             let hasChildren = false;
             if (enterData.length + index + 1 < last) {

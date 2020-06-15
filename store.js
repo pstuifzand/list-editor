@@ -41,6 +41,57 @@ function Store(inputData) {
         return values[idList[i + 1]]
     }
 
+    function prevCursorPosition(cursor) {
+        let curIndent = values[idList[cursor]].indented
+        let curClosed = values[idList[cursor]].fold !== 'open';
+        if (!curClosed) {
+            curIndent = 10000000;
+        }
+        let moving = true
+
+        while (moving) {
+            cursor--
+            if (cursor < 0) {
+                cursor = idList.length - 1
+                curIndent = values[idList[cursor]].indented
+            }
+            let next = values[idList[cursor]];
+            if (curIndent >= next.indented && !next.hidden) {
+                moving = false
+            }
+        }
+
+        return cursor
+    }
+
+    /**
+     * Find the next 'open' position in the list.
+     *
+     * @param {number} cursor
+     * @returns {number}
+     */
+    function nextCursorPosition(cursor) {
+        let curIndent = values[idList[cursor]].indented
+        let curClosed = values[idList[cursor]].fold !== 'open';
+        if (!curClosed) {
+            curIndent = 10000000;
+        }
+        let moving = true
+
+        while (moving) {
+            cursor++
+            if (cursor >= idList.length) {
+                cursor = 0
+                curIndent = 0
+            }
+            let next = values[idList[cursor]];
+            if (curIndent >= next.indented) {
+                moving = false
+            }
+        }
+
+        return cursor
+    }
 
     /**
      *
@@ -243,6 +294,8 @@ function Store(inputData) {
         moveBefore,
         firstSameIndented,
         lastHigherIndented,
+        prevCursorPosition,
+        nextCursorPosition,
         debug
     };
 }
