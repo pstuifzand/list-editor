@@ -237,14 +237,14 @@ function editor(root, inputData, options) {
         editing = true
 
         let elements = $(rootElement).children('div.list-item');
-        let $textarea = $('<textarea rows="1" class="input-line">');
-        $textarea.textareaAutoSize()
+        let $textarea = $('<textarea rows=1 class="input-line">');
         $textarea.val(cursor.getCurrent(store).text).trigger('input')
         let currentElement = cursor.getCurrentElement(elements);
         currentElement.find('.content').replaceWith($textarea)
         currentElement.addClass('editor');
         $textarea.focus()
         $textarea.data(cursor.getCurrent(store))
+        $textarea.textareaAutoSize()
         currentEditor = $textarea
         trigger('start-editing', currentEditor[0])
         return $textarea
