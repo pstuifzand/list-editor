@@ -187,7 +187,6 @@ function editor(root, inputData, options) {
                 return
             }
 
-            console.log(startID, stopID)
             let id = store.moveBefore(startID, stopID)
 
             let position = store.index(id);
@@ -320,7 +319,6 @@ function editor(root, inputData, options) {
     }
 
     function on(evt, handler) {
-        console.log(evt)
         events[evt].push(handler)
     }
 
