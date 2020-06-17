@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2020-06-17
+
+- Added rendering/rendered events
+- Changed transform option, the second arguments is on element now
+
 ## [0.7.6] - 2020-06-15
 
 - Remove the jump from the textarea with multiple lines when moving to it.
