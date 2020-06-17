@@ -16,8 +16,8 @@ function editor(root, inputData, options) {
     let selection = createSelection()
 
     let defaults = {
-        transform(text, callback) {
-            return callback(he.encode(text))
+        transform(text, element) {
+            element.html(he.encode(text))
         }
     }
 
@@ -41,6 +41,8 @@ function editor(root, inputData, options) {
         change: [],
         'start-editing': [],
         'stop-editing': [],
+        'rendering': [],
+        'rendered': []
     }
 
     let editing = false
@@ -56,11 +58,9 @@ function editor(root, inputData, options) {
             .data('indented', value.indented)
             .css('margin-left', (value.indented * 32) + 'px')
         let line = $('<div class="line">')
-        line.prepend(
-            options.transform(value.text, (text) => {
-                return $('<span class="content"></span>').html(text)
-            })
-        )
+        let content = $('<div class="content">')
+        line.prepend(content)
+        options.transform(value.text, content)
         line.prepend($('<span class="marker"></span>'))
         line.prepend($('<span class="fold">&#9654;</span>'))
         el.prepend(line)
@@ -72,6 +72,8 @@ function editor(root, inputData, options) {
      * @param rootData
      */
     function render(rootElement, rootData) {
+        trigger('rendering')
+
         let first = 0;
         let last = rootData.length();
 
@@ -106,9 +108,7 @@ function editor(root, inputData, options) {
                 .find('.content')
             value.hidden = value.indented >= hideLevel
 
-            options.transform(value.text, (text) => {
-                return $li.html(text)
-            })
+            options.transform(value.text, $li)
 
             if (value.indented < hideLevel) {
                 if (value.fold !== 'open') {
@@ -163,6 +163,8 @@ function editor(root, inputData, options) {
         })
 
         $exitEl.remove()
+
+        trigger('rendered')
     }
 
     function disableDragging(drake) {
@@ -218,10 +220,8 @@ function editor(root, inputData, options) {
 
         trigger('change')
 
-        let $span = $('<span class="content">');
-        options.transform(text, (text) => {
-            return $span.html(text)
-        })
+        let $span = $('<div class="content">');
+        options.transform(text, $span)
         element.replaceWith($span);
         trigger('stop-editing', currentEditor[0])
         editing = false
