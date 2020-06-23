@@ -49,7 +49,7 @@ function editor(root, inputData, options) {
     let currentEditor = null;
 
     function newListItem(indented) {
-        return {indented: indented, text: '', fold: 'open'}
+        return {indented: indented, text: '', fold: 'open', hidden: false}
     }
 
     function newItem(value) {
