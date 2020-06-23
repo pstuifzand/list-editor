@@ -185,6 +185,7 @@ function editor(root, inputData, options) {
             startID = $(el).data('id')
         })
 
+
         drake.on('drop', function (el, target, source, sibling) {
             let stopID = $(sibling).data('id')
             if (startID === stopID) {
@@ -420,6 +421,7 @@ function editor(root, inputData, options) {
                 let item = newListItem(indent)
                 cursor.insertAbove(store, item)
             } else {
+                let insertion = cursor.save()
                 let currentValue = store.value(store.currentID(cursor.get()));
                 let current = currentValue ? currentValue.indented : 0
                 let next = cursor.get() + 1 < store.length() ? store.value(store.currentID(cursor.get() + 1)).indented : current
@@ -429,7 +431,6 @@ function editor(root, inputData, options) {
             }
 
             selection.selectOne(cursor.get(), store)
-
             trigger('change')
         } else if (event.key === 'Tab') {
             if (selection.hasSelection()) {
@@ -438,19 +439,19 @@ function editor(root, inputData, options) {
             } else {
                 let prevIndent = cursor.getCurrent(store).indented
                 if (cursor.atFirst()) {
-                    store.update(cursor.getCurrent(store).id, function (item) {
+                    store.update(cursor.getId(store), function (item) {
                         item.indented = 0
                         return item
                     })
                 } else if (event.shiftKey) {
-                    store.update(cursor.getId(), function (value) {
+                    store.update(cursor.getId(store), function (value) {
                         value.indented = Math.max(value.indented - 1, 0)
                         return value
                     })
                 } else {
                     // FIXME: fold previous open
                     // data[cursor.get() - 1].fold = 'open'
-                    store.update(cursor.getId(), function (value, prev) {
+                    store.update(cursor.getId(store), function (value, prev) {
                         value.indented = Math.min(prev.indented + 1, value.indented + 1)
                         return value
                     })
@@ -462,7 +463,10 @@ function editor(root, inputData, options) {
             }
 
             next = false
+        } else {
+            return true
         }
+
         disableDragging(drake)
         render(root, store);
         drake = enableDragging(root)

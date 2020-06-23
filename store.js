@@ -1,5 +1,11 @@
 import _ from 'lodash';
 
+/**
+ * NOTE: Store should contain all methods that work with items. At the moment
+ * there are still a few places where we change the items from the outside,
+ * while it's very important that the items behave a certain way.
+ */
+
 function Store(inputData) {
     let idList = [];
     let values = {};
@@ -13,6 +19,9 @@ function Store(inputData) {
      * @returns {string}
      */
     function currentID(index) {
+        if (index === idList.length) {
+            return 'at-end'
+        }
         return idList[index];
     }
 
@@ -68,9 +77,10 @@ function Store(inputData) {
      * Find the next 'open' position in the list.
      *
      * @param {number} cursor
+     * @param {bool} wrap
      * @returns {number}
      */
-    function nextCursorPosition(cursor) {
+    function nextCursorPosition(cursor, wrap) {
         let curIndent = values[idList[cursor]].indented
         let curClosed = values[idList[cursor]].fold !== 'open';
         if (!curClosed) {
@@ -80,9 +90,13 @@ function Store(inputData) {
 
         while (moving) {
             cursor++
-            if (cursor >= idList.length) {
-                cursor = 0
-                curIndent = 0
+            if (wrap) {
+                if (cursor >= idList.length) {
+                    cursor = 0
+                    curIndent = 0
+                }
+            } else {
+                return cursor
             }
             let next = values[idList[cursor]];
             if (curIndent >= next.indented) {
@@ -118,6 +132,13 @@ function Store(inputData) {
      * @returns {string}
      */
     function insertAfter(afterId, ...items) {
+        if (afterId === 'at-end') {
+            let newItems = _.map(items, item => {
+                return this.append(item)
+            })
+            return newItems[0]
+        }
+
         let index = _.findIndex(idList, (id) => id === afterId)
 
         let newItems = _.map(items, item => {
@@ -130,7 +151,7 @@ function Store(inputData) {
             return item.id
         })
         idList.splice(index + 1, 0, ...newItems)
-        return newItems[0].id
+        return newItems[0]
     }
 
     /**

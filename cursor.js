@@ -8,11 +8,17 @@ function createCursor(start) {
         set(newPosition) {
             cursor = newPosition;
         },
+        getId(store) {
+            return store.currentID(cursor)
+        },
         atFirst() {
             return cursor === 0;
         },
         atPosition(other) {
             return cursor === other;
+        },
+        atEnd(store) {
+            return cursor === store.length()
         },
         hasMoved(saved) {
             return cursor !== saved.get()
@@ -31,7 +37,7 @@ function createCursor(start) {
             cursor = store.prevCursorPosition(cursor)
         },
         moveDown(store) {
-            cursor = store.nextCursorPosition(cursor)
+            cursor = store.nextCursorPosition(cursor, true)
         },
         remove(store) {
             store.remove(cursor, 1)
@@ -40,9 +46,12 @@ function createCursor(start) {
             store.insertBefore(store.currentID(cursor), item)
         },
         insertBelow(store, item) {
-            store.insertAfter(store.currentID(cursor), item)
-            cursor++
-        }
+            let id = store.insertAfter(store.currentID(cursor), item)
+            cursor = store.index(id)
+        },
+        forwardToNextVisible(store) {
+            cursor = store.nextCursorPosition(cursor, false)
+        },
     };
 }
 
