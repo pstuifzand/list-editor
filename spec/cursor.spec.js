@@ -24,9 +24,27 @@ describe("A cursor", function() {
             this.store = createStore([])
         })
 
-        it("contains an atEnd method", function() {
+        it("contains an atEnd method", function () {
             this.cursor.set(0)
             expect(this.cursor.atEnd(this.store)).toBe(true)
+        })
+    })
+
+    describe("with a store", function () {
+        beforeEach(function () {
+            this.store = createStore([
+                {indented:0, fold: 'open'},
+                {indented:1, fold: 'open'},
+                {indented:2, fold: 'open'},
+                {indented:3, fold: 'open'},
+                {indented:1, fold: 'open'},
+            ])
+        })
+
+        it("moveUp moves up by one", function() {
+            this.cursor.set(4)
+            this.cursor.moveUp(this.store)
+            expect(this.cursor.get()).toBe(3)
         })
     })
 })
