@@ -269,8 +269,9 @@ function Store(inputData) {
     }
 
     /**
-     * @param {int} first
-     * @returns {int}
+     * @param {Number} first
+     * @param {Number} indent
+     * @returns {Number}
      */
     function firstSameIndented(first, indent) {
         if (first <= 0 || first >= idList.length) return first

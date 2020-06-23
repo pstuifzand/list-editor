@@ -433,35 +433,7 @@ function editor(root, inputData, options) {
             selection.selectOne(cursor.get(), store)
             trigger('change')
         } else if (event.key === 'Tab') {
-            if (selection.hasSelection()) {
-                selection.indent(store, event.shiftKey ? -1 : 1)
-                trigger('change')
-            } else {
-                let prevIndent = cursor.getCurrent(store).indented
-                if (cursor.atFirst()) {
-                    store.update(cursor.getId(store), function (item) {
-                        item.indented = 0
-                        return item
-                    })
-                } else if (event.shiftKey) {
-                    store.update(cursor.getId(store), function (value) {
-                        value.indented = Math.max(value.indented - 1, 0)
-                        return value
-                    })
-                } else {
-                    // FIXME: fold previous open
-                    // data[cursor.get() - 1].fold = 'open'
-                    store.update(cursor.getId(store), function (value, prev) {
-                        value.indented = Math.min(prev.indented + 1, value.indented + 1)
-                        return value
-                    })
-                }
-                let newIndent = cursor.getCurrent(store).indented
-                if (prevIndent !== newIndent) {
-                    trigger('change')
-                }
-            }
-
+            store.indent(cursor.get(), store.lastHigherIndented(cursor.get()) - cursor.get(), event.shiftKey ? -1 : 1)
             next = false
         } else {
             return true
