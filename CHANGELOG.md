@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.3] - 2020-06-23
+
+- Added 'hidden' to default fields newListItem.
+- Fix movement bug when moving up
+
 ## [0.8.2] - 2020-06-23
 
 - Simplify indenting. Now we indent all children with a higher indent numbering.
