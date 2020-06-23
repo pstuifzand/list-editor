@@ -5,7 +5,7 @@
   "author": "Peter Stuifzand <peter@p83.nl>",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine --require=esm"
   },
   "keywords": [],
   "license": "ISC",
@@ -15,7 +15,10 @@
     "jquery": "^3.5.1",
     "lodash": "^4.17.15"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "esm": "^3.2.25",
+    "jasmine": "^3.5.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/pstuifzand/list-editor.git"
