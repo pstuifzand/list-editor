@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.6] - 2020-06-24
+
+- Fixed update method of editor where the before object wasn't cloned, so 
+  was always equal to replace object
+
+## [0.8.5] - 2020-06-24
+
 ## [0.8.4] - 2020-06-24
 
 - Added 'update' method to editor. It calls the 'update' method of store.
