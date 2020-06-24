@@ -509,9 +509,9 @@ function editor(root, inputData, options) {
         drake = enableDragging(root)
     });
 
-    function update(callback) {
+    function update(id, callback) {
         let changed = false
-        store.update(cursor.getId(store), function (item, prev, next) {
+        store.update(id, function (item, prev, next) {
             let before = Object.assign({}, item)
             item = callback(item, prev, next)
             changed = item.text !== before.text || item.indented !== before.indented || item.fold !== before.fold
