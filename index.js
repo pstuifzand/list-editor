@@ -509,6 +509,10 @@ function editor(root, inputData, options) {
         drake = enableDragging(root)
     });
 
+    function update(callback) {
+        store.update(cursor.getId(store), callback)
+    }
+
     disableDragging(drake)
     render(root, store);
     drake = enableDragging(root)
@@ -520,7 +524,8 @@ function editor(root, inputData, options) {
         on,
         save,
         saveTree,
-        copy
+        copy,
+        update
     };
 }
 
