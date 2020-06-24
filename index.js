@@ -512,7 +512,7 @@ function editor(root, inputData, options) {
     function update(callback) {
         let changed = false
         store.update(cursor.getId(store), function (item, prev, next) {
-            let before = item
+            let before = Object.assign({}, item)
             item = callback(item, prev, next)
             changed = item.text !== before.text || item.indented !== before.indented || item.fold !== before.fold
             return item
