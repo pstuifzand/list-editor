@@ -510,7 +510,16 @@ function editor(root, inputData, options) {
     });
 
     function update(callback) {
-        store.update(cursor.getId(store), callback)
+        let changed = false
+        store.update(cursor.getId(store), function (item, prev, next) {
+            let before = item
+            item = callback(item, prev, next)
+            changed = item.text !== before.text || item.indented !== before.indented || item.fold !== before.fold
+            return item
+        })
+        if (changed) {
+            trigger('change')
+        }
     }
 
     disableDragging(drake)
