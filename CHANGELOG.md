@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.4] - 2020-06-24
+
+- Added 'update' method to editor. It calls the 'update' method of store.
+
 ## [0.8.3] - 2020-06-23
 
 - Added 'hidden' to default fields newListItem.
