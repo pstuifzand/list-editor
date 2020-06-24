@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.7] - 2020-06-24
+
+- Added `id` parameter to `update` method
+
 ## [0.8.6] - 2020-06-24
 
 - Fixed update method of editor where the before object wasn't cloned, so 
