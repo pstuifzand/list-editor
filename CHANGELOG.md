@@ -101,3 +101,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Start new item opened
 
+[Unreleased]: https://github.com/pstuifzand/list-editor/compare/0.8.11...HEAD
+[0.8.11]: https://github.com/pstuifzand/list-editor/compare/0.8.10...0.8.11
+[0.8.10]: https://github.com/pstuifzand/list-editor/compare/0.8.9...0.8.10
+[0.8.9]: https://github.com/pstuifzand/list-editor/compare/0.8.8...0.8.9
+[0.8.8]: https://github.com/pstuifzand/list-editor/compare/0.8.7...0.8.8
+[0.8.7]: https://github.com/pstuifzand/list-editor/compare/0.8.6...0.8.7
+[0.8.6]: https://github.com/pstuifzand/list-editor/compare/0.8.5...0.8.6
+[0.8.5]: https://github.com/pstuifzand/list-editor/compare/0.8.4...0.8.5
+[0.8.4]: https://github.com/pstuifzand/list-editor/compare/0.8.3...0.8.4
+[0.8.3]: https://github.com/pstuifzand/list-editor/compare/0.8.2...0.8.3
+[0.8.2]: https://github.com/pstuifzand/list-editor/compare/0.8.1...0.8.2
+[0.8.1]: https://github.com/pstuifzand/list-editor/compare/0.8.0...0.8.1
+[0.8.0]: https://github.com/pstuifzand/list-editor/compare/0.7.8...0.8.0
+[0.7.8]: https://github.com/pstuifzand/list-editor/compare/0.7.7...0.7.8
