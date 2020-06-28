@@ -139,5 +139,26 @@ describe("A store", function () {
             {text: "d", id: "_d", indented: 0}
         ])
     })
+
+    it("contains a tree method that accepts a from argument", function () {
+        let store = createStore([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 1},
+            {text: "c", id: "_c", indented: 2},
+            {text: "d", id: "_d", indented: 0},
+        ])
+        let tree = store.tree("_a")
+        expect(tree).toEqual([
+            {
+                text: "a", id: "_a", indented: 0, children: [
+                    {
+                        text: "b", id: "_b", indented: 1, children: [
+                            {text: "c", id: "_c", indented: 2},
+                        ]
+                    },
+                ]
+            },
+        ])
+    })
 })
 

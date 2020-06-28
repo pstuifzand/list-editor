@@ -296,13 +296,23 @@ function Store(inputData) {
         return first
     }
 
+    function selectItemsFrom(from) {
+        if (!from) {
+            return _.map(idList, id => values[id])
+        }
+
+        let first = _.findIndex(idList, id => id === from)
+        let items = _.map(idList.slice(first + 1), id => values[id])
+        return [values[from], ..._.takeWhile(items, item => item.indented > values[from].indented)]
+    }
+
     /**
      * Return a tree starting at from node down.
      * @param from
      * @returns {*}
      */
     function tree(from) {
-        let items = debug().result;
+        let items = selectItemsFrom(from)
 
         let top = (stack) => {
             return stack[stack.length - 1];

@@ -265,10 +265,15 @@ function editor(root, inputData, options) {
         });
     }
 
-    function copy(element) {
+    function copy(element, opt) {
+        let item = $(element).parents('.list-item')
+        let id = item.data('id')
+
+        if (opt.recursive) {
+            return saveTree(id)
+        }
+
         return new Promise(function (resolve, reject) {
-            let item = $(element).parents('.list-item')
-            let id = item.data('id')
             resolve(store.value(id));
         });
     }
