@@ -296,6 +296,57 @@ function Store(inputData) {
         return first
     }
 
+    /**
+     * Return a tree starting at from node down.
+     * @param from
+     * @returns {*}
+     */
+    function tree(from) {
+        let items = debug().result;
+
+        let top = (stack) => {
+            return stack[stack.length - 1];
+        }
+
+        let pop = (stack) => {
+            stack.pop()
+        }
+        let push = (stack, item) => {
+            stack.push(item)
+        }
+
+        const stack = _.reduce(items, (stack, item) => {
+            if (stack.length === 0) {
+                return [[item]]
+            }
+
+            const stackIndented = top(stack)[0].indented
+            const itemIndented = item.indented
+
+            if (itemIndented > stackIndented) {
+                push(stack, [item])
+            } else {
+                while (stack.length > 1 && itemIndented < stackIndented) {
+                    let children = top(stack)
+                    pop(stack)
+                    let cur = top(stack)
+                    cur[cur.length - 1].children = children
+                }
+                top(stack).push(item)
+            }
+            return stack
+        }, [])
+
+        while (stack.length > 1) {
+            let children = top(stack)
+            pop(stack)
+            let item = top(stack)
+            item[item.length - 1].children = children
+        }
+
+        return top(stack)
+    }
+
     _.each(inputData, (d) => {
         append(d)
     })
@@ -318,7 +369,8 @@ function Store(inputData) {
         lastHigherIndented,
         prevCursorPosition,
         nextCursorPosition,
-        debug
+        debug,
+        tree
     };
 }
 

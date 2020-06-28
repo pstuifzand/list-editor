@@ -41,5 +41,103 @@ describe("A store", function () {
 
         expect(this.store.lastHigherIndented(1)).toBe(4)
     })
+
+    it("contains a tree method that returns same indent items as a list", function () {
+        let store = createStore([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 0},
+            {text: "c", id: "_c", indented: 0},
+            {text: "d", id: "_d", indented: 0}
+        ])
+        let tree = store.tree()
+        expect(tree).toEqual([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 0},
+            {text: "c", id: "_c", indented: 0},
+            {text: "d", id: "_d", indented: 0}
+        ])
+    })
+
+    it("contains a tree method that returns children as a list in children", function () {
+        let store = createStore([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 1},
+            {text: "c", id: "_c", indented: 1},
+            {text: "d", id: "_d", indented: 1}
+        ])
+        let tree = store.tree()
+        expect(tree).toEqual([
+            {
+                text: "a", id: "_a", indented: 0, children: [
+                    {text: "b", id: "_b", indented: 1},
+                    {text: "c", id: "_c", indented: 1},
+                    {text: "d", id: "_d", indented: 1}
+                ]
+            },
+        ])
+    })
+
+    it("contains a tree method that returns multiple children as a list in children", function () {
+        let store = createStore([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 1},
+            {text: "c", id: "_c", indented: 0},
+            {text: "d", id: "_d", indented: 1}
+        ])
+        let tree = store.tree()
+        expect(tree).toEqual([
+            {
+                text: "a", id: "_a", indented: 0, children: [
+                    {text: "b", id: "_b", indented: 1},
+                ]
+            },
+            {
+                text: "c", id: "_c", indented: 0, children: [
+                    {text: "d", id: "_d", indented: 1}
+                ]
+            },
+        ])
+    })
+
+    it("contains a tree method that transform 0,1,2", function () {
+        let store = createStore([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 1},
+            {text: "c", id: "_c", indented: 2},
+        ])
+        let tree = store.tree()
+        expect(tree).toEqual([
+            {
+                text: "a", id: "_a", indented: 0, children: [
+                    {
+                        text: "b", id: "_b", indented: 1, children: [
+                            {text: "c", id: "_c", indented: 2}]
+                    }
+                ]
+            },
+        ])
+    })
+
+    it("contains a tree method that returns deeper children as a list in children", function () {
+        let store = createStore([
+            {text: "a", id: "_a", indented: 0},
+            {text: "b", id: "_b", indented: 1},
+            {text: "c", id: "_c", indented: 2},
+            {text: "d", id: "_d", indented: 0},
+        ])
+        let tree = store.tree()
+        expect(tree).toEqual([
+            {
+                text: "a", id: "_a", indented: 0, children: [
+                    {
+                        text: "b", id: "_b", indented: 1, children: [
+                            {text: "c", id: "_c", indented: 2},
+                        ]
+                    },
+                ]
+            },
+            {text: "d", id: "_d", indented: 0}
+        ])
+    })
 })
 

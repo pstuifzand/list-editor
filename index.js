@@ -259,57 +259,9 @@ function editor(root, inputData, options) {
         });
     }
 
-    function saveTree() {
+    function saveTree(from) {
         return new Promise(function (resolve, reject) {
-            let items = store.debug().result;
-
-            let top = (stack) => {
-                return stack[stack.length - 1];
-            }
-
-            let pop = (stack) => {
-                stack.pop()
-            }
-            let push = (stack, item) => {
-                stack.push(item)
-            }
-
-            const stack = _.reduce(items, (stack, item) => {
-                if (stack.length === 0) {
-                    return [[item]]
-                }
-
-                const stackIndented = top(stack)[0].indented
-                const itemIndented = item.indented
-
-                if (stackIndented < itemIndented) {
-                    push(stack, [item])
-                } else if (stackIndented > itemIndented) {
-                    let children = top(stack)
-                    let newItem = item
-                    pop(stack)
-                    let cur = top(stack)
-                    cur[cur.length - 1].children = children
-                    if (top(stack)[0].indented === itemIndented)
-                        top(stack).push(item)
-                    else
-                        push(stack, [newItem])
-                } else { // ===
-                    top(stack).push(item)
-                }
-
-                return stack
-
-            }, [])
-
-            while (stack.length > 1) {
-                let children = top(stack)
-                pop(stack)
-                let item = top(stack)
-                item[item.length - 1].children = children
-            }
-
-            resolve(top(stack))
+            resolve(store.tree(from))
         });
     }
 
