@@ -1,3 +1,5 @@
+![Node.js Package](https://github.com/pstuifzand/list-editor/workflows/Node.js%20Package/badge.svg)
+
 # Wiki List Editor
 
 First install the package.
