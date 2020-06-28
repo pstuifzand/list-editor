@@ -165,6 +165,7 @@ function Store(inputData) {
             item.id = newId
             id = newId
         }
+        delete item.children
         values[id] = item;
         idList.push(id)
         return id;
@@ -334,7 +335,7 @@ function Store(inputData) {
             const itemIndented = item.indented
 
             if (itemIndented > stackIndented) {
-                push(stack, [item])
+                push(stack, [Object.assign({}, item)])
             } else {
                 while (stack.length > 1 && itemIndented < stackIndented) {
                     let children = top(stack)
@@ -342,7 +343,7 @@ function Store(inputData) {
                     let cur = top(stack)
                     cur[cur.length - 1].children = children
                 }
-                top(stack).push(item)
+                top(stack).push(Object.assign({}, item))
             }
             return stack
         }, [])
