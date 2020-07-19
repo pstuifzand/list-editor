@@ -1,13 +1,13 @@
 import _ from 'lodash'
 import $ from 'jquery'
 import he from 'he'
-import textareaAutosizeIinit from "./textarea.autosize"
+import textareaAutosizeInit from "./textarea.autosize"
 import dragula from 'dragula'
 import createCursor from './cursor'
 import createSelection from './selection'
 import Store from './store'
 
-textareaAutosizeIinit($)
+textareaAutosizeInit($)
 
 function editor(root, inputData, options) {
     root.classList.add('root')
