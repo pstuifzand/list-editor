@@ -105,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Start new item opened
 
-[Unreleased]: https://github.com/pstuifzand/list-editor/compare/0.8.11...HEAD
+[Unreleased]: https://github.com/pstuifzand/list-editor/compare/0.8.12...HEAD
+[0.8.12]: https://github.com/pstuifzand/list-editor/compare/0.8.11...0.8.12
 [0.8.11]: https://github.com/pstuifzand/list-editor/compare/0.8.10...0.8.11
 [0.8.10]: https://github.com/pstuifzand/list-editor/compare/0.8.9...0.8.10
 [0.8.9]: https://github.com/pstuifzand/list-editor/compare/0.8.8...0.8.9
