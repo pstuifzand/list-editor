@@ -90,8 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.6.9] - 2020-06-07
 
-## [0.7.0] - 2020-06-07
-
 ### Added
 
 * Add `saveTree` method that passes a tree-like structure as the first
