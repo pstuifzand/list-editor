@@ -307,6 +307,10 @@ function Store(inputData) {
         return [values[from], ..._.takeWhile(items, item => item.indented > values[from].indented)]
     }
 
+    function flat(from) {
+        return selectItemsFrom(from)
+    }
+
     /**
      * Return a tree starting at from node down.
      * @param from
@@ -381,7 +385,8 @@ function Store(inputData) {
         prevCursorPosition,
         nextCursorPosition,
         debug,
-        tree
+        tree,
+        flat
     };
 }
 

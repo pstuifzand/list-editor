@@ -290,8 +290,7 @@ function editor(root, inputData, options) {
         })
     }
 
-
-    $(document).on('paste', '.input-line', function (event) {
+    $(root).on('paste', '.input-line', function (event) {
         let tag = event.target.tagName.toLowerCase();
         if (tag === 'textarea' && currentEditor[0].value.substring(0, 3) === '```') {
             return true
@@ -324,7 +323,7 @@ function editor(root, inputData, options) {
         return false
     });
 
-    $(document).on('keydown', '.input-line', function (event) {
+    $(root).on('keydown', '.input-line', function (event) {
         if (event.key === 'Escape') {
             stopEditing(root, store, $(this))
             selection.selectOne(cursor.get(), store)
@@ -333,7 +332,7 @@ function editor(root, inputData, options) {
         return true
     });
 
-    $(document).on('keydown', function (event) {
+    $(root).on('keydown', function (event) {
         let tag = event.target.tagName.toLowerCase();
         if (tag === 'textarea' && currentEditor[0].value.substring(0, 3) === '```') {
             return true
@@ -418,17 +417,17 @@ function editor(root, inputData, options) {
         }
         return next
     })
-    $(document).on('click', '.marker', function () {
+    $(root).on('click', '.marker', function () {
         stopEditing(root, store, $(this).next('textarea'));
         return false;
     });
 
-    $(document).on('click', '.content a', function (event) {
+    $(root).on('click', '.content a', function (event) {
         event.stopPropagation()
         return true
     })
 
-    $(document).on('click', '.list-item', function () {
+    $(root).on('click', '.list-item', function () {
         let currentIndex = $(root).children('div.list-item').index(this)
         if (cursor.atPosition(currentIndex) && currentEditor !== null && currentEditor.closest('.list-item')[0] === this) {
             return true
@@ -448,7 +447,7 @@ function editor(root, inputData, options) {
         return false
     })
 
-    $(document).on('click', '.fold', function () {
+    $(root).on('click', '.fold', function () {
         let open = !$(this).hasClass('open');
         $(this).toggleClass('open', open)
         $(this).toggleClass('closed', !open)
