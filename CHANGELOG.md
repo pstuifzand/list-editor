@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrleased]
 
+## [0.8.13] - 2020-09-03
+
 - Allow multiple editors on the same page.
 
 ## [0.8.12] - 2020-07-19
@@ -108,7 +110,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Start new item opened
 
-[Unreleased]: https://github.com/pstuifzand/list-editor/compare/0.8.12...HEAD
+[Unreleased]: https://github.com/pstuifzand/list-editor/compare/0.8.13...HEAD
+[0.8.13]: https://github.com/pstuifzand/list-editor/compare/0.8.12...0.8.13
 [0.8.12]: https://github.com/pstuifzand/list-editor/compare/0.8.11...0.8.12
 [0.8.11]: https://github.com/pstuifzand/list-editor/compare/0.8.10...0.8.11
 [0.8.10]: https://github.com/pstuifzand/list-editor/compare/0.8.9...0.8.10
